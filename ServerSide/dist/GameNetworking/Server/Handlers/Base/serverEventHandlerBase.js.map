@@ -1,0 +1,1 @@
+{"version":3,"file":"serverEventHandlerBase.js","sourceRoot":"","sources":["../../../../../src/GameNetworking/Server/Handlers/Base/serverEventHandlerBase.ts"],"names":[],"mappings":"AAGA,MAAe,sBAAsB;IAIjC,YAAY,MAAc;QACtB,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;IACzB,CAAC;CAGJ;AAED,OAAO,EAAE,sBAAsB,EAAE,CAAA"}

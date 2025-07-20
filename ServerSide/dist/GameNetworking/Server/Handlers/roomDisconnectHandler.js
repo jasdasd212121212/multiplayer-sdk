@@ -1,0 +1,29 @@
+import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
+import { responseEventsList } from "../responseEventsList.js";
+class roomDisconnectHandler extends serverEventHandlerBase {
+    constructor() {
+        super(...arguments);
+        this.name = "disconnect";
+    }
+    handle(message, sourceSocket) {
+        let room = this.server.getCachedConnection(sourceSocket);
+        let clientConnection = null;
+        if (room != null && room != undefined) {
+            clientConnection = room.findClientBySocket(sourceSocket);
+            room.removeConnection(clientConnection);
+            if (room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0) {
+                room.transferHost();
+                room.broadcast(responseEventsList.roomHostTransfered, JSON.stringify({ targetId: room.getHostClientId() }));
+            }
+            if (room.getConnectionsCount() > 0) {
+                room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
+            }
+            this.server.deleteCachedConnection(sourceSocket);
+            console.log(`Client: ${clientConnection.getId()} was disconnected from room: ${room.getId()}`);
+        }
+        room = null;
+        clientConnection = null;
+    }
+}
+export { roomDisconnectHandler };
+//# sourceMappingURL=roomDisconnectHandler.js.map
