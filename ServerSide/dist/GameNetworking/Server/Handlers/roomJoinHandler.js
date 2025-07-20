@@ -1,6 +1,7 @@
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { client } from "../../ClientConnection/client.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
 class roomJoinHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
@@ -16,7 +17,12 @@ class roomJoinHandler extends serverEventHandlerBase {
                 let clientConnection = new client(clientId, sourceSocket);
                 room.addConnection(clientConnection);
                 this.server.addCachedConnection(sourceSocket, room);
-                sourceSocket.emit(responseEventsList.clientConnected, JSON.stringify({ clientId: clientId, objects: room.getObjectsPackege(room.getObjectsArray()) }));
+                sourceSocket.emit(responseEventsList.clientConnected, JSON.stringify({
+                    clientId: clientId,
+                    hostId: room.getHostClientId(),
+                    objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll)
+                }));
+                room.castOthers(responseEventsList.playerConnected, "", sourceSocket);
             }
             else {
                 sourceSocket.emit(responseEventsList.clientConnectionFailed);

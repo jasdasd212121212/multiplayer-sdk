@@ -5,6 +5,7 @@ import { vector3 } from "../../vector3.js";
 import { gameObject } from "../../Room/gameObject.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
+import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
 
 class createObjectHandler extends serverEventHandlerBase{
     name: string = "CreateObject";
@@ -22,7 +23,7 @@ class createObjectHandler extends serverEventHandlerBase{
             let creator: client = currentRoom.findClientBySocket(sourceSocket);
             let created: gameObject = currentRoom.instatiateObject(assetPath, position, rotation, creator);
 
-            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify({createdObject: created, cretorClientId: creator.getId()}));
+            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify(created.getAllData(syncronizationPackegeGenerationOptions.syncAll)));
         }
     }
 }

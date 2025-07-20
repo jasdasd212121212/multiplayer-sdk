@@ -4,13 +4,14 @@ import { responseEventsList } from "../Server/responseEventsList.js";
 import { vector3 } from "../vector3.js";
 import { gameObject } from "./gameObject.js"
 import { roomTicker } from "./roomTicker.js";
+import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 
 class room{
     private objects: Array<gameObject> = [];
     private clients: Array<client> = [];
     private roomId: string;
     private nextId: number = 0;
-    private nextObjectId: number = 0;
+    private nextObjectId: number = 0; 
     private hostClientId: number = -1;
 
     private ticker: roomTicker = null;
@@ -64,8 +65,19 @@ class room{
         return this.objects.length;
     }
 
-    public getObjectsPackege(sourceList: Array<gameObject>): object{
-        return {roomObjects: sourceList};
+    public getObjectsPackege(sourceList: Array<gameObject>, option: string): object{
+        let resultData: Array<object> = [];
+
+        if(option == "" || option == null || option == undefined){
+            console.warn("Option of generating packege is empty or null");
+            option = syncronizationPackegeGenerationOptions.syncAll;
+        }
+
+        for(let i: number = 0; i < sourceList.length; i++){
+            resultData.push(sourceList[i].getAllData(option));
+        }
+        
+        return {o: resultData};
     }
 
     public getObjectsArray(): Array<gameObject>{
@@ -112,16 +124,19 @@ class room{
     }
 
     public transferAllObjects(sourceId: number, destinationId: number): void{
-        let transferdObjects: Array<gameObject> = [];
+        let transferdObjects: Array<number> = [];
         
         for(let i: number = 0; i < this.objects.length; i++){
             if(this.objects[i].getClientId() == sourceId){
                 this.objects[i].transferTo(destinationId);
-                transferdObjects.push(this.objects[i]);
+                transferdObjects.push(this.objects[i].getObjectId());
             }
         }
 
-        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({objects: transferdObjects}));
+        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({
+            tarnsferedToClient: destinationId, 
+            objects: transferdObjects
+        }));
     }
 
     public transferHost(): client{
@@ -133,6 +148,16 @@ class room{
     public broadcast(event: string, message: string): void{
         for(let i: number = 0; i < this.clients.length; i++){
             this.clients[i].getSocket().emit(event, message);
+        }
+    }
+
+    public castOthers(event: string, message: string, sourceSocket: Socket){
+        for(let i: number = 0; i < this.clients.length; i++){
+            let target: Socket = this.clients[i].getSocket();
+            
+            if(target.id != sourceSocket.id){
+                target.emit(event, message);
+            }
         }
     }
 }

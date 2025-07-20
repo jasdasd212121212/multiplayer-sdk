@@ -1,4 +1,5 @@
 import { vector3 } from "../vector3.js";
+import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 
 class gameObject{
     public position: vector3;
@@ -30,6 +31,29 @@ class gameObject{
 
     public transferTo(newId: number) : void{
         this._clientId = newId;
+    }
+
+    public getAllData(option: string): object{
+        switch(option){
+            case syncronizationPackegeGenerationOptions.syncAll:
+                return { 
+                    a: this._assetPath, 
+                    i: this._objectId, 
+                    c: this._clientId, 
+                    p: this.position, 
+                    r: this.rotation
+                };
+            
+            case syncronizationPackegeGenerationOptions.syncOnlyTransfor:
+                return { i: this._objectId, p: this.position, r: this.rotation };
+
+            case syncronizationPackegeGenerationOptions.syncOnlyId:
+                return { i: this._objectId };
+
+            default:
+                console.error("Undefined game object data option: " + option);
+                return null;
+        }
     }
 }
 

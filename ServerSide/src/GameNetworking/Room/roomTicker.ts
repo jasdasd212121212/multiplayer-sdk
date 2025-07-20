@@ -1,5 +1,6 @@
 import { responseEventsList } from "../Server/responseEventsList.js";
 import { netframe } from "./netframe.js";
+import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { room } from "./room.js";
 
 const TICKRATE = 1;
@@ -7,7 +8,7 @@ const TICKRATE = 1;
 class roomTicker{
     private attackhedRoom: room;
     private netframeBuffer: netframe;
-
+ 
     constructor(room: room){
         this.attackhedRoom = room;
         this.netframeBuffer = new netframe();
@@ -24,9 +25,8 @@ class roomTicker{
         
         this.attackhedRoom.broadcast(responseEventsList.objectsTick, JSON.stringify(
             this.attackhedRoom.getObjectsPackege(
-                this.netframeBuffer.filterOnlyUpdated(
-                    this.attackhedRoom.getObjectsArray()
-                )
+                this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()),
+                syncronizationPackegeGenerationOptions.syncOnlyTransfor
             )
         ));
 

@@ -1,5 +1,6 @@
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
 class createObjectHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
@@ -14,7 +15,7 @@ class createObjectHandler extends serverEventHandlerBase {
         if (currentRoom != null) {
             let creator = currentRoom.findClientBySocket(sourceSocket);
             let created = currentRoom.instatiateObject(assetPath, position, rotation, creator);
-            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify({ createdObject: created, cretorClientId: creator.getId() }));
+            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify(created.getAllData(syncronizationPackegeGenerationOptions.syncAll)));
         }
     }
 }

@@ -1,5 +1,6 @@
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { v6 as uuidv6 } from 'uuid';
 class roomCreationHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
@@ -7,9 +8,16 @@ class roomCreationHandler extends serverEventHandlerBase {
     }
     handle(message, sourceSocket) {
         let options = JSON.parse(message);
-        console.log(`Room named: ${options.name} created with id: ${sourceSocket.id}`);
-        this.server.createRoom(sourceSocket.id);
-        sourceSocket.emit(responseEventsList.roomCreated, JSON.stringify({ createdRoomId: sourceSocket.id }));
+        let isConnectedToAnyRoom = this.server.hasCachedConnection(sourceSocket);
+        let guid = new Date().toISOString() + uuidv6();
+        if (!isConnectedToAnyRoom) {
+            console.log(`Room named: ${options.name} created with id: ${guid}`);
+            this.server.createRoom(guid);
+            sourceSocket.emit(responseEventsList.roomCreated, JSON.stringify({ createdRoomId: guid }));
+        }
+        else {
+            sourceSocket.emit(responseEventsList.roomCreationReject);
+        }
     }
 }
 export { roomCreationHandler };

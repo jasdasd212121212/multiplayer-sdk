@@ -14,4 +14,4 @@ handlers.push(new roomDisconnectHandler(gameServer));
 handlers.push(new createObjectHandler(gameServer));
 
 gameServer.initHandlers(handlers);
-gameServer.start();
+gameServer.start(); 

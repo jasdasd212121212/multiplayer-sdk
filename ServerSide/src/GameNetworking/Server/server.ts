@@ -33,7 +33,7 @@ class server{
 
     public start(): void{
         httpServer.listen(7000, () => {
-            console.log("Server started!");
+            console.log("Server started!"); 
         });
 
         io.on("connection", (user: Socket) => {

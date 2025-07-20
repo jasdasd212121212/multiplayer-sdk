@@ -5,6 +5,8 @@ export const responseEventsList = {
     objectsTransfered: "roomObjectsTransfered",
     objectsTick: "objectsTick",
     objectCreated: "objectCreated",
-    roomCreated: "roomCreated"
+    roomCreated: "roomCreated",
+    playerConnected: "newConnection",
+    roomCreationReject: "roomCreateReject"
 };
 //# sourceMappingURL=responseEventsList.js.map

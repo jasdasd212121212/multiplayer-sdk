@@ -1,6 +1,7 @@
 import { responseEventsList } from "../Server/responseEventsList.js";
 import { gameObject } from "./gameObject.js";
 import { roomTicker } from "./roomTicker.js";
+import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 class room {
     constructor(id) {
         this.objects = [];
@@ -45,8 +46,16 @@ class room {
     getObjectsCount() {
         return this.objects.length;
     }
-    getObjectsPackege(sourceList) {
-        return { roomObjects: sourceList };
+    getObjectsPackege(sourceList, option) {
+        let resultData = [];
+        if (option == "" || option == null || option == undefined) {
+            console.warn("Option of generating packege is empty or null");
+            option = syncronizationPackegeGenerationOptions.syncAll;
+        }
+        for (let i = 0; i < sourceList.length; i++) {
+            resultData.push(sourceList[i].getAllData(option));
+        }
+        return { o: resultData };
     }
     getObjectsArray() {
         return this.objects;
@@ -86,10 +95,13 @@ class room {
         for (let i = 0; i < this.objects.length; i++) {
             if (this.objects[i].getClientId() == sourceId) {
                 this.objects[i].transferTo(destinationId);
-                transferdObjects.push(this.objects[i]);
+                transferdObjects.push(this.objects[i].getObjectId());
             }
         }
-        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({ objects: transferdObjects }));
+        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({
+            tarnsferedToClient: destinationId,
+            objects: transferdObjects
+        }));
     }
     transferHost() {
         this.hostClientId = this.clients[0].getId();
@@ -98,6 +110,14 @@ class room {
     broadcast(event, message) {
         for (let i = 0; i < this.clients.length; i++) {
             this.clients[i].getSocket().emit(event, message);
+        }
+    }
+    castOthers(event, message, sourceSocket) {
+        for (let i = 0; i < this.clients.length; i++) {
+            let target = this.clients[i].getSocket();
+            if (target.id != sourceSocket.id) {
+                target.emit(event, message);
+            }
         }
     }
 }
