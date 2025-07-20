@@ -7,6 +7,7 @@ import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 
 class room{
+    private name: string;
     private objects: Array<gameObject> = [];
     private clients: Array<client> = [];
     private roomId: string;
@@ -16,11 +17,16 @@ class room{
 
     private ticker: roomTicker = null;
 
-    constructor(id: string){
+    constructor(id: string, roomName: string){
         this.roomId = id;
+        this.name = roomName;
 
         this.ticker = new roomTicker(this);
         this.ticker.start();
+    }
+
+    public getName(): string{
+        return this.name;
     }
 
     public getId(): string{

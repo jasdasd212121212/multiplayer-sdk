@@ -6,12 +6,13 @@ import { gameObject } from "../../Room/gameObject.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
 import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
+import { IObjectCreationPackege } from "./Interfaces/IObjectCreationPackege.js";
 
 class createObjectHandler extends serverEventHandlerBase{
     name: string = "CreateObject";
     
     handle(message: string, sourceSocket: Socket): void {
-        let parsed = JSON.parse(message);
+        let parsed = <IObjectCreationPackege>JSON.parse(message);
 
         let assetPath: string = parsed.asset;
         let position: vector3 = parsed.position;

@@ -18,7 +18,7 @@ class netframe {
             let object = objects[i];
             let netFrame = this.netBuffer[i];
             if (object != null && object != undefined && i <= (objects.length - 1)) {
-                if (object.position != netFrame.position || object.rotation != netFrame.rotation) {
+                if (!this.vectorEquals(object.position, netFrame.position) || !this.vectorEquals(object.rotation, netFrame.rotation)) {
                     result.push(object);
                 }
             }
@@ -27,6 +27,9 @@ class netframe {
     }
     isEmpty() {
         return this.currentFrameSize == 0;
+    }
+    vectorEquals(left, right) {
+        return left.x == right.x && left.y == right.y && left.z == right.z;
     }
 }
 class netframePiece {

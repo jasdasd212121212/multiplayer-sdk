@@ -4,12 +4,13 @@ import { room } from "../../Room/room.js";
 import { client } from "../../ClientConnection/client.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
+import { IRoomJoinPackege } from "./Interfaces/IRoomJoinPackege.js";
 
 class roomJoinHandler extends serverEventHandlerBase{
     name: string = "JoinRoom";
 
     handle(message: string, sourceSocket: Socket): void {
-        let options = JSON.parse(message);
+        let options = <IRoomJoinPackege>JSON.parse(message);
         let roomId: string = options.id;
 
         let room: room = this.server.findRoom(roomId);

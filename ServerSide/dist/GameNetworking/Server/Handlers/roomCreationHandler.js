@@ -12,7 +12,7 @@ class roomCreationHandler extends serverEventHandlerBase {
         let guid = new Date().toISOString() + uuidv6();
         if (!isConnectedToAnyRoom) {
             console.log(`Room named: ${options.name} created with id: ${guid}`);
-            this.server.createRoom(guid);
+            this.server.createRoom(guid, options.name);
             sourceSocket.emit(responseEventsList.roomCreated, JSON.stringify({ createdRoomId: guid }));
         }
         else {

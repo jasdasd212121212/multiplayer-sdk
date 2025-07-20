@@ -42,8 +42,8 @@ class server {
             //this.filterEmptyRooms(this.rooms); // TODO: enable this after unity interaction
         }, 10000);
     }
-    createRoom(id) {
-        this.rooms.push(new room(id));
+    createRoom(id, name) {
+        this.rooms.push(new room(id, name));
     }
     findRoom(id) {
         for (let i = 0; i < this.rooms.length; i++) {

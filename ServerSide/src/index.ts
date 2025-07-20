@@ -1,5 +1,6 @@
 import { serverEventHandlerBase } from "./GameNetworking/Server/Handlers/Base/serverEventHandlerBase.js";
 import { createObjectHandler } from "./GameNetworking/Server/Handlers/createObjectHandler.js";
+import { objectsUpdateHandler } from "./GameNetworking/Server/Handlers/objectsUpdateHandler.js";
 import { roomCreationHandler } from "./GameNetworking/Server/Handlers/roomCreationHandler.js";
 import { roomDisconnectHandler } from "./GameNetworking/Server/Handlers/roomDisconnectHandler.js";
 import { roomJoinHandler } from "./GameNetworking/Server/Handlers/roomJoinHandler.js";
@@ -12,6 +13,7 @@ handlers.push(new roomCreationHandler(gameServer));
 handlers.push(new roomJoinHandler(gameServer));
 handlers.push(new roomDisconnectHandler(gameServer));
 handlers.push(new createObjectHandler(gameServer));
+handlers.push(new objectsUpdateHandler(gameServer));
 
 gameServer.initHandlers(handlers);
 gameServer.start(); 

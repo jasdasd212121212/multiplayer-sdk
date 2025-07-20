@@ -3,7 +3,7 @@ import { gameObject } from "./gameObject.js";
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 class room {
-    constructor(id) {
+    constructor(id, roomName) {
         this.objects = [];
         this.clients = [];
         this.nextId = 0;
@@ -11,8 +11,12 @@ class room {
         this.hostClientId = -1;
         this.ticker = null;
         this.roomId = id;
+        this.name = roomName;
         this.ticker = new roomTicker(this);
         this.ticker.start();
+    }
+    getName() {
+        return this.name;
     }
     getId() {
         return this.roomId;

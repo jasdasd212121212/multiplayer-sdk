@@ -49,8 +49,8 @@ class server{
         }, 10000); 
     }
 
-    public createRoom(id: string){
-        this.rooms.push(new room(id));
+    public createRoom(id: string, name: string){
+        this.rooms.push(new room(id, name));
     }
 
     public findRoom(id: string): room{
