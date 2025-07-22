@@ -49,8 +49,8 @@ class server{
         }, 10000); 
     }
 
-    public createRoom(id: string, name: string){
-        this.rooms.push(new room(id, name));
+    public createRoom(id: string, name: string, data: object){
+        this.rooms.push(new room(id, name, data));
     }
 
     public findRoom(id: string): room{
@@ -85,7 +85,8 @@ class server{
         for(let i: number = 0; i < this.rooms.length; i++){
             list.push({
                 name: this.rooms[i].getName(),
-                guid: this.rooms[i].getId()
+                guid: this.rooms[i].getId(),
+                data: this.rooms[i].getData()
             });
         }
 

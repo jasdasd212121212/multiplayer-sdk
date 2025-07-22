@@ -8,6 +8,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 
 class room{
     private name: string;
+    private externalData: object;
     private objects: Map<number, gameObject> = new Map();
     private objectsArray: Array<gameObject> = [];
     private clients: Array<client> = [];
@@ -18,9 +19,10 @@ class room{
 
     private ticker: roomTicker = null;
 
-    constructor(id: string, roomName: string){
+    constructor(id: string, roomName: string, additionalData: object){
         this.roomId = id;
         this.name = roomName;
+        this.externalData = additionalData;
 
         this.ticker = new roomTicker(this);
         this.ticker.start();
@@ -32,6 +34,10 @@ class room{
 
     public getId(): string{
         return this.roomId;
+    }
+
+    public getData(): object{
+        return this.externalData;
     }
 
     public getHostClientId(): number{

@@ -3,7 +3,7 @@ import { gameObject } from "./gameObject.js";
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 class room {
-    constructor(id, roomName) {
+    constructor(id, roomName, additionalData) {
         this.objects = new Map();
         this.objectsArray = [];
         this.clients = [];
@@ -13,6 +13,7 @@ class room {
         this.ticker = null;
         this.roomId = id;
         this.name = roomName;
+        this.externalData = additionalData;
         this.ticker = new roomTicker(this);
         this.ticker.start();
     }
@@ -21,6 +22,9 @@ class room {
     }
     getId() {
         return this.roomId;
+    }
+    getData() {
+        return this.externalData;
     }
     getHostClientId() {
         return this.hostClientId;

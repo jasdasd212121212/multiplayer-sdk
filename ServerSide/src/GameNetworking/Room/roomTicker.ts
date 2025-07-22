@@ -3,7 +3,7 @@ import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { room } from "./room.js";
 
-const TICKRATE = 1;
+const TICKRATE = 20;
 
 class roomTicker{
     private attackhedRoom: room;
