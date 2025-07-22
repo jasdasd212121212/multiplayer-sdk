@@ -4,7 +4,8 @@ import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 class room {
     constructor(id, roomName) {
-        this.objects = [];
+        this.objects = new Map();
+        this.objectsArray = [];
         this.clients = [];
         this.nextId = 0;
         this.nextObjectId = 0;
@@ -26,29 +27,23 @@ class room {
     }
     instatiateObject(assetPath, position, rotation, creator) {
         let created = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);
-        this.objects.push(created);
+        this.objects.set(created.getObjectId(), created);
+        this.updateObjectsArray();
         this.nextObjectId++;
         return created;
     }
     removeObject(obj) {
-        const index = this.objects.indexOf(obj, 0);
-        if (index > -1) {
-            this.objects.splice(index, 1);
-        }
+        this.objects.delete(obj.getObjectId());
+        this.updateObjectsArray();
     }
     findObject(id) {
-        for (let i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].getObjectId() == id) {
-                return this.objects[i];
-            }
-        }
-        return null;
+        return this.objects.get(id);
     }
     getObject(index) {
         return this.objects[index];
     }
     getObjectsCount() {
-        return this.objects.length;
+        return this.objects.size;
     }
     getObjectsPackege(sourceList, option) {
         let resultData = [];
@@ -62,7 +57,7 @@ class room {
         return { o: resultData };
     }
     getObjectsArray() {
-        return this.objects;
+        return this.objectsArray;
     }
     addConnection(connection) {
         if (this.hostClientId == -1) {
@@ -96,10 +91,10 @@ class room {
     }
     transferAllObjects(sourceId, destinationId) {
         let transferdObjects = [];
-        for (let i = 0; i < this.objects.length; i++) {
-            if (this.objects[i].getClientId() == sourceId) {
-                this.objects[i].transferTo(destinationId);
-                transferdObjects.push(this.objects[i].getObjectId());
+        for (let i = 0; i < this.objects.size; i++) {
+            if (this.objectsArray[i].getClientId() == sourceId) {
+                this.objectsArray[i].transferTo(destinationId);
+                transferdObjects.push(this.objectsArray[i].getObjectId());
             }
         }
         this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({
@@ -123,6 +118,9 @@ class room {
                 target.emit(event, message);
             }
         }
+    }
+    updateObjectsArray() {
+        this.objectsArray = Array.from(this.objects.values());
     }
 }
 export { room };

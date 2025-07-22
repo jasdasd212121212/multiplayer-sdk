@@ -15,6 +15,7 @@ class createObjectHandler extends serverEventHandlerBase{
         let parsed = <IObjectCreationPackege>JSON.parse(message);
 
         let assetPath: string = parsed.asset;
+        let cguid: string = parsed.cguid;
         let position: vector3 = parsed.position;
         let rotation: vector3 = parsed.rotation;
 
@@ -24,7 +25,10 @@ class createObjectHandler extends serverEventHandlerBase{
             let creator: client = currentRoom.findClientBySocket(sourceSocket);
             let created: gameObject = currentRoom.instatiateObject(assetPath, position, rotation, creator);
 
-            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify(created.getAllData(syncronizationPackegeGenerationOptions.syncAll)));
+            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify({
+                cguid: cguid,
+                data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll)
+            }));
         }
     }
 }

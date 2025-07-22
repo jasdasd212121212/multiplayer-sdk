@@ -8,7 +8,8 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 
 class room{
     private name: string;
-    private objects: Array<gameObject> = [];
+    private objects: Map<number, gameObject> = new Map();
+    private objectsArray: Array<gameObject> = [];
     private clients: Array<client> = [];
     private roomId: string;
     private nextId: number = 0;
@@ -39,7 +40,8 @@ class room{
 
     public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client): gameObject{
         let created: gameObject = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);       
-        this.objects.push(created);
+        this.objects.set(created.getObjectId(), created);
+        this.updateObjectsArray();
 
         this.nextObjectId++;
 
@@ -47,28 +49,20 @@ class room{
     }
 
     public removeObject(obj: gameObject): void{
-        const index = this.objects.indexOf(obj, 0);
-        if (index > -1) {
-            this.objects.splice(index, 1);
-        }
+        this.objects.delete(obj.getObjectId());
+        this.updateObjectsArray();
     }
 
     public findObject(id: number): gameObject{
-        for(let i: number = 0; i < this.objects.length; i++){
-            if(this.objects[i].getObjectId() == id){
-                return this.objects[i];
-            }
-        }
-
-        return null;
+        return this.objects.get(id);
     }
 
     public getObject(index: number): gameObject{
-        return this.objects[index];
+        return this.objectsArray[index];
     }
 
     public getObjectsCount(): number{
-        return this.objects.length;
+        return this.objects.size;
     }
 
     public getObjectsPackege(sourceList: Array<gameObject>, option: string): object{
@@ -87,7 +81,7 @@ class room{
     }
 
     public getObjectsArray(): Array<gameObject>{
-        return this.objects;
+        return this.objectsArray;
     }
 
 
@@ -132,10 +126,10 @@ class room{
     public transferAllObjects(sourceId: number, destinationId: number): void{
         let transferdObjects: Array<number> = [];
         
-        for(let i: number = 0; i < this.objects.length; i++){
-            if(this.objects[i].getClientId() == sourceId){
-                this.objects[i].transferTo(destinationId);
-                transferdObjects.push(this.objects[i].getObjectId());
+        for(let i: number = 0; i < this.objects.size; i++){
+            if(this.objectsArray[i].getClientId() == sourceId){
+                this.objectsArray[i].transferTo(destinationId);
+                transferdObjects.push(this.objectsArray[i].getObjectId());
             }
         }
 
@@ -165,6 +159,10 @@ class room{
                 target.emit(event, message);
             }
         }
+    }
+
+    private updateObjectsArray(): void{
+        this.objectsArray = Array.from(this.objects.values());
     }
 }
 

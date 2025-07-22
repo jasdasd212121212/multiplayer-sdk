@@ -9,13 +9,17 @@ class createObjectHandler extends serverEventHandlerBase {
     handle(message, sourceSocket) {
         let parsed = JSON.parse(message);
         let assetPath = parsed.asset;
+        let cguid = parsed.cguid;
         let position = parsed.position;
         let rotation = parsed.rotation;
         let currentRoom = this.server.getCachedConnection(sourceSocket);
         if (currentRoom != null) {
             let creator = currentRoom.findClientBySocket(sourceSocket);
             let created = currentRoom.instatiateObject(assetPath, position, rotation, creator);
-            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify(created.getAllData(syncronizationPackegeGenerationOptions.syncAll)));
+            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify({
+                cguid: cguid,
+                data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll)
+            }));
         }
     }
 }

@@ -20,7 +20,7 @@ class roomJoinHandler extends serverEventHandlerBase {
                 sourceSocket.emit(responseEventsList.clientConnected, JSON.stringify({
                     clientId: clientId,
                     hostId: room.getHostClientId(),
-                    objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll)
+                    objects: room.getObjectsPackege(Array.from(room.getObjectsArray().values()), syncronizationPackegeGenerationOptions.syncAll)
                 }));
                 room.castOthers(responseEventsList.playerConnected, "", sourceSocket);
             }
