@@ -38,12 +38,7 @@ class raiseEventor {
         this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JSON.stringify(event));
     }
     sendOthers(event, source) {
-        for (let i = 0; i < this.attackhedRoom.getConnectionsCount(); i++) {
-            let currentSocket = this.attackhedRoom.getConnection(i).getSocket();
-            if (currentSocket != source) {
-                currentSocket.emit(responseEventsList.raiseEvent, JSON.stringify(event));
-            }
-        }
+        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JSON.stringify(event), source);
     }
     sendToTarget(event) {
         let targetClient = event.targetClient;

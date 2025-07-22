@@ -55,13 +55,7 @@ class raiseEventor{
     }
 
     private sendOthers(event: IRaiseEventPackege, source: Socket): void{
-        for(let i: number = 0; i < this.attackhedRoom.getConnectionsCount(); i++){
-            let currentSocket: Socket = this.attackhedRoom.getConnection(i).getSocket();
-
-            if(currentSocket != source){
-                currentSocket.emit(responseEventsList.raiseEvent, JSON.stringify(event));
-            }
-        }
+        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JSON.stringify(event), source);
     }   
 
     private sendToTarget(event: IRaiseEventPackege): void{
