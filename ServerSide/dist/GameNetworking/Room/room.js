@@ -40,7 +40,7 @@ class room {
         return this.objects.get(id);
     }
     getObject(index) {
-        return this.objects[index];
+        return this.objectsArray[index];
     }
     getObjectsCount() {
         return this.objects.size;
