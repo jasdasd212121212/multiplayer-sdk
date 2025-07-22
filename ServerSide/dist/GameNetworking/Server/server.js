@@ -65,6 +65,16 @@ class server {
     hasCachedConnection(clientSocket) {
         return this.cachedConnections.has(clientSocket.id);
     }
+    getRoomsList() {
+        let list = [];
+        for (let i = 0; i < this.rooms.length; i++) {
+            list.push({
+                name: this.rooms[i].getName(),
+                guid: this.rooms[i].getId()
+            });
+        }
+        return { rooms: list };
+    }
     filterEmptyRooms(rooms) {
         if (rooms == undefined) {
             return;

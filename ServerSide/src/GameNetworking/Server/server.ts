@@ -79,6 +79,19 @@ class server{
         return this.cachedConnections.has(clientSocket.id);
     }
 
+    public getRoomsList(): object{
+        let list: Array<object> = [];
+
+        for(let i: number = 0; i < this.rooms.length; i++){
+            list.push({
+                name: this.rooms[i].getName(),
+                guid: this.rooms[i].getId()
+            });
+        }
+
+        return { rooms: list };
+    }
+
     private filterEmptyRooms(rooms: Array<room>): void{
         if(rooms == undefined){
             return;
