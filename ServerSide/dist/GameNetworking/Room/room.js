@@ -2,6 +2,7 @@ import { responseEventsList } from "../Server/responseEventsList.js";
 import { gameObject } from "./gameObject.js";
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
+import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 class room {
     constructor(id, roomName, additionalData) {
         this.objects = new Map();
@@ -11,10 +12,12 @@ class room {
         this.nextObjectId = 0;
         this.hostClientId = -1;
         this.ticker = null;
+        this.raiseEventDispatcher = null;
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
         this.ticker = new roomTicker(this);
+        this.raiseEventDispatcher = new raiseEventor(this);
         this.ticker.start();
     }
     getName() {
@@ -28,6 +31,9 @@ class room {
     }
     getHostClientId() {
         return this.hostClientId;
+    }
+    sendRaiseEvent(event, sourceSocket) {
+        this.raiseEventDispatcher.sendEvent(event, sourceSocket);
     }
     instatiateObject(assetPath, position, rotation, creator) {
         let created = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);
@@ -68,6 +74,7 @@ class room {
             this.hostClientId = connection.getId();
         }
         this.clients.push(connection);
+        this.raiseEventDispatcher.retryBuffer();
     }
     removeConnection(client) {
         const index = this.clients.indexOf(client, 0);

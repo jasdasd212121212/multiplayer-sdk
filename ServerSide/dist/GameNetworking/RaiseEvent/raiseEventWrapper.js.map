@@ -1,0 +1,1 @@
+{"version":3,"file":"raiseEventWrapper.js","sourceRoot":"","sources":["../../../src/GameNetworking/RaiseEvent/raiseEventWrapper.ts"],"names":[],"mappings":"AAGA,MAAM,iBAAiB;IAInB,YAAY,MAA0B,EAAE,OAAe;QACnD,IAAI,CAAC,KAAK,GAAG,MAAM,CAAC;QACpB,IAAI,CAAC,MAAM,GAAG,OAAO,CAAC;IAC1B,CAAC;CACJ;AAED,OAAO,EAAE,iBAAiB,EAAE,CAAA"}

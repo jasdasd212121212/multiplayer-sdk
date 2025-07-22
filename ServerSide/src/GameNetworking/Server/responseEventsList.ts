@@ -9,5 +9,6 @@ export const responseEventsList = {
     playerConnected: "newConnection",
     roomCreationReject: "roomCreateReject",
     objectRemoved: "objectDeleted",
-    roomsList: "roomsList"
+    roomsList: "roomsList",
+    raiseEvent: "raiseEvent"
 }

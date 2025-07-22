@@ -5,6 +5,8 @@ import { vector3 } from "../vector3.js";
 import { gameObject } from "./gameObject.js"
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
+import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
+import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
 
 class room{
     private name: string;
@@ -18,6 +20,7 @@ class room{
     private hostClientId: number = -1;
 
     private ticker: roomTicker = null;
+    private raiseEventDispatcher: raiseEventor = null;
 
     constructor(id: string, roomName: string, additionalData: object){
         this.roomId = id;
@@ -25,6 +28,8 @@ class room{
         this.externalData = additionalData;
 
         this.ticker = new roomTicker(this);
+        this.raiseEventDispatcher = new raiseEventor(this);
+
         this.ticker.start();
     }
 
@@ -42,6 +47,10 @@ class room{
 
     public getHostClientId(): number{
         return this.hostClientId;
+    }
+
+    public sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): void{
+        this.raiseEventDispatcher.sendEvent(event, sourceSocket);
     }
 
     public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client): gameObject{
@@ -97,6 +106,8 @@ class room{
         }
 
         this.clients.push(connection);
+
+        this.raiseEventDispatcher.retryBuffer();
     }
 
     public removeConnection(client: client): void{

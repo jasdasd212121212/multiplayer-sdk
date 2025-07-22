@@ -1,7 +1,7 @@
 import { responseEventsList } from "../Server/responseEventsList.js";
 import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
-const TICKRATE = 20;
+const TICKRATE = 1;
 class roomTicker {
     constructor(room) {
         this.attackhedRoom = room;
