@@ -48,7 +48,7 @@ class server{
         });
 
         setInterval(() => {
-            //this.filterEmptyRooms(this.rooms); // TODO: enable this after unity interaction
+            //this.filterEmptyRooms(this.rooms); TODO: make filtering by creation date and TTL
         }, 10000); 
     }
 

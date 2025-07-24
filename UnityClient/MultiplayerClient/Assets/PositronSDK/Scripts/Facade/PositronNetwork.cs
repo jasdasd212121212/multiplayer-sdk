@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Threading;
 using UnityEngine;
 
 namespace Positron
@@ -11,6 +10,8 @@ namespace Positron
         private static SettingsLoader _settingsLoader;
 
         private static bool _initialized;
+
+        public static bool IsConnectedToMaster => _client.IsConnected;
 
         public static void Initialize(IPositronClient client)
         {
@@ -23,11 +24,18 @@ namespace Positron
             _settingsLoader = new();
             _client = client;
 
+            _client.AddHandler(new GetRoomsHandler());
+
             _initialized = true;
         }
 
         public static void ConnectToMasterServer(Action connectCallback)
         {
+            if (_client.IsConnected)
+            {
+                return;
+            }
+
             _client.ConnectToMaster(_settingsLoader.Load());
             _client.connected += () => 
             { 
@@ -35,8 +43,13 @@ namespace Positron
             };
         }
 
-        public static async UniTask ConnectToMaster()
+        public static async UniTask ConnectToMasterServer()
         {
+            if (_client.IsConnected)
+            {
+                return;
+            }
+
             bool connected = false;
 
             _client.ConnectToMaster(_settingsLoader.Load());
@@ -46,6 +59,21 @@ namespace Positron
             };
 
             await UniTask.WaitWhile(() => !connected);
+        }
+
+        public static T GetHandler<T>() where T : IClientMessageHandler
+        {
+            return _client.GetHandler<T>();
+        }
+
+        public static void FetchRoomsList()
+        {
+            if (!_client.IsConnected)
+            {
+                return;
+            }
+
+            _client.Send(ReqestEventNamesHolder.GET_ROOMS_LIST, "");
         }
     }
 }

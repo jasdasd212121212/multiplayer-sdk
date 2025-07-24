@@ -2,6 +2,8 @@ using SocketIOClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using SocketIOClient.Transport;
 
 namespace Positron
 {
@@ -10,12 +12,17 @@ namespace Positron
         private List<IClientMessageHandler> _eventHandlers = new();
         private SocketIOUnity _socket;
 
+        public bool IsConnected => _socket != null && _socket.Connected;
+
         public event Action connected;
 
         public void ConnectToMaster(ClientSettings settings)
         {
             Uri uri = new(settings.BuildURL());
-            _socket = new SocketIOUnity(uri);
+            SocketIOOptions options = new();
+            options.Transport = TransportProtocol.WebSocket;
+
+            _socket = new SocketIOUnity(uri, options);
             _socket.ConnectAsync();
 
             _socket.On(EventNamesHolder.CONNECTED, (data) =>
@@ -37,7 +44,7 @@ namespace Positron
         {
             _eventHandlers.Add(handler);
 
-            if (_socket.Connected)
+            if (IsConnected)
             {
                 BindHandlerToSocket(handler);
             }
@@ -60,7 +67,15 @@ namespace Positron
         {
             _socket.On(handler.EventName, (SocketIOResponse data) =>
             {
-                handler.Process(data.ToString());
+                int length = data.Count;
+                StringBuilder result = new();
+
+                for (int i = 0; i < length; i++)
+                {
+                    result.Append(data.GetValue(i));
+                }
+
+                handler.Process(result.ToString());
             });
         }
     }

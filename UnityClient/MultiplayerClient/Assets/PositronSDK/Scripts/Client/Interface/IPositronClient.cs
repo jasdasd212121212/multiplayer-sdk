@@ -4,6 +4,8 @@ namespace Positron
 {
     public interface IPositronClient
     {
+        bool IsConnected { get; }
+
         event Action connected;
 
         void ConnectToMaster(ClientSettings settings);
