@@ -37,6 +37,9 @@ class server{
         });
 
         io.on("connection", (user: Socket) => {
+            console.log("new connection");
+            user.emit("connected");
+
             for(let i: number = 0; i < this.handlers.length; i++){
                 user.on(this.handlers[i].name, (data) => {
                     this.handlers[i].handle(data, user)

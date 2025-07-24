@@ -32,6 +32,8 @@ class server {
             console.log("Server started!");
         });
         io.on("connection", (user) => {
+            console.log("new connection");
+            user.emit("connected");
             for (let i = 0; i < this.handlers.length; i++) {
                 user.on(this.handlers[i].name, (data) => {
                     this.handlers[i].handle(data, user);
