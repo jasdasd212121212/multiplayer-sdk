@@ -5,7 +5,11 @@ import { serverEventHandlerBase } from "./Handlers/Base/serverEventHandlerBase.j
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
-    perMessageDeflate: {
+    cors: {
+        origin: "*" // Allow all origins for testing.  NEVER do this in production.
+    },
+    transports: ["websocket"], // Force WebSocket
+    perMessageDeflate: {  // Configure per-message deflate at the top level
         zlibDeflateOptions: {
             chunkSize: 1024,
             memLevel: 7,
@@ -14,9 +18,9 @@ const io = new Server(httpServer, {
         zlibInflateOptions: {
             chunkSize: 1024
         },
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
+        clientNoContextTakeover: true,  //CRUCIAL!
+        serverNoContextTakeover: true,  //CRUCIAL!
+        serverMaxWindowBits: 15, // Or keep it at 10; experiment.
         concurrencyLimit: 60,
         threshold: 128
     }

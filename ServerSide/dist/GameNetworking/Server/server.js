@@ -3,6 +3,10 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 const httpServer = createServer();
 const io = new Server(httpServer, {
+    cors: {
+        origin: "*" // Allow all origins for testing.  NEVER do this in production.
+    },
+    transports: ["websocket"], // Force WebSocket
     perMessageDeflate: {
         zlibDeflateOptions: {
             chunkSize: 1024,
@@ -12,9 +16,9 @@ const io = new Server(httpServer, {
         zlibInflateOptions: {
             chunkSize: 1024
         },
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
+        clientNoContextTakeover: true, //CRUCIAL!
+        serverNoContextTakeover: true, //CRUCIAL!
+        serverMaxWindowBits: 15, // Or keep it at 10; experiment.
         concurrencyLimit: 60,
         threshold: 128
     }
@@ -41,7 +45,7 @@ class server {
             }
         });
         setInterval(() => {
-            //this.filterEmptyRooms(this.rooms); // TODO: enable this after unity interaction
+            //this.filterEmptyRooms(this.rooms); TODO: make filtering by creation date and TTL
         }, 10000);
     }
     createRoom(id, name, data) {
