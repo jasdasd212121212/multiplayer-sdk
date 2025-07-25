@@ -1,6 +1,7 @@
 import { responseEventsList } from "../Server/responseEventsList.js";
 import { raiseEventsTargets } from "./raiseEventsTargets.js";
 import { raiseBuffer } from "./raiseBuffer.js";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class raiseEventor {
     constructor(targetRoom) {
         this.attackhedRoom = targetRoom;
@@ -35,17 +36,17 @@ class raiseEventor {
         }
     }
     sendAll(event) {
-        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JSON.stringify(event));
+        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
     }
     sendOthers(event, source) {
-        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JSON.stringify(event), source);
+        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event), source);
     }
     sendToTarget(event) {
         let targetClient = event.targetClient;
         for (let i = 0; i < this.attackhedRoom.getConnectionsCount(); i++) {
             let currentClient = this.attackhedRoom.getConnection(i);
             if (currentClient.getId() == targetClient) {
-                currentClient.getSocket().emit(responseEventsList.raiseEvent, JSON.stringify(event));
+                currentClient.getSocket().emit(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
             }
         }
     }

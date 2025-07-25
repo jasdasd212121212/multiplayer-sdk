@@ -6,6 +6,7 @@ import { raiseEventsTargets } from "./raiseEventsTargets.js";
 import { client } from "../ClientConnection/client.js";
 import { raiseBuffer } from "./raiseBuffer.js";
 import { raiseEventWrapper } from "./raiseEventWrapper.js";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 
 class raiseEventor{
     private attackhedRoom: room;
@@ -51,11 +52,11 @@ class raiseEventor{
     }
 
     private sendAll(event: IRaiseEventPackege): void{
-        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JSON.stringify(event));
+        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
     }
 
     private sendOthers(event: IRaiseEventPackege, source: Socket): void{
-        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JSON.stringify(event), source);
+        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event), source);
     }   
 
     private sendToTarget(event: IRaiseEventPackege): void{
@@ -65,7 +66,7 @@ class raiseEventor{
             let currentClient: client = this.attackhedRoom.getConnection(i);
 
             if(currentClient.getId() == targetClient){
-                currentClient.getSocket().emit(responseEventsList.raiseEvent, JSON.stringify(event));
+                currentClient.getSocket().emit(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
             }
         }
     }

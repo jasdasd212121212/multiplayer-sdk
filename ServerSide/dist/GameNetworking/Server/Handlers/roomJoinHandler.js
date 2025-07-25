@@ -2,13 +2,14 @@ import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { client } from "../../ClientConnection/client.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class roomJoinHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
         this.name = "JoinRoom";
     }
     handle(message, sourceSocket) {
-        let options = JSON.parse(message);
+        let options = JsonCompressor.instance.parse(message);
         let roomId = options.id;
         let room = this.server.findRoom(roomId);
         if (room != null) {
@@ -17,7 +18,7 @@ class roomJoinHandler extends serverEventHandlerBase {
                 let clientConnection = new client(clientId, sourceSocket);
                 room.addConnection(clientConnection);
                 this.server.addCachedConnection(sourceSocket, room);
-                sourceSocket.emit(responseEventsList.clientConnected, JSON.stringify({
+                sourceSocket.emit(responseEventsList.clientConnected, JsonCompressor.instance.stringify({
                     clientId: clientId,
                     hostId: room.getHostClientId(),
                     objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll)

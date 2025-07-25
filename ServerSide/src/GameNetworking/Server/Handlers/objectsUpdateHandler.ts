@@ -4,12 +4,13 @@ import { IObjectUpgradePackege } from "./Interfaces/IObjectUpgradePackege.js";
 import { room } from "../../Room/room.js";
 import { ISyncPackegeObject } from "./Interfaces/ISyncPackegeObject.js";
 import { gameObject } from "../../Room/gameObject.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class objectsUpdateHandler extends serverEventHandlerBase{
     name: string = "UpgradeObjects";
 
     handle(message: string, sourceSocket: Socket): void {
-        let parsed: IObjectUpgradePackege = <IObjectUpgradePackege>JSON.parse(message);
+        let parsed: IObjectUpgradePackege = <IObjectUpgradePackege>JsonCompressor.instance.parse(message);
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if(currentRoom != null){

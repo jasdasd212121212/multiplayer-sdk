@@ -4,12 +4,13 @@ import { IDeleteObjectPackege } from "./Interfaces/IDeleteObjectPackege.js";
 import { room } from "../../Room/room.js";
 import { gameObject } from "../../Room/gameObject.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class removeObjectHandler extends serverEventHandlerBase{
     name: string = "DeleteObject";
 
     handle(message: string, sourceSocket: Socket): void {
-        let parsed: IDeleteObjectPackege = <IDeleteObjectPackege>JSON.parse(message);
+        let parsed: IDeleteObjectPackege = <IDeleteObjectPackege>JsonCompressor.instance.parse(message);
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if(currentRoom != null){
@@ -18,7 +19,7 @@ class removeObjectHandler extends serverEventHandlerBase{
             if(targetGameObject != null && targetGameObject.getClientId() == parsed.client){
                 currentRoom.removeObject(targetGameObject);
 
-                currentRoom.broadcast(responseEventsList.objectRemoved, JSON.stringify({
+                currentRoom.broadcast(responseEventsList.objectRemoved, JsonCompressor.instance.stringify({
                     id: parsed.id
                 }));
             }

@@ -7,6 +7,7 @@ import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 
 class room{
     private name: string;
@@ -150,7 +151,7 @@ class room{
             }
         }
 
-        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({
+        this.broadcast(responseEventsList.objectsTransfered, JsonCompressor.instance.stringify({
             tarnsferedToClient: destinationId, 
             objects: transferdObjects
         }));

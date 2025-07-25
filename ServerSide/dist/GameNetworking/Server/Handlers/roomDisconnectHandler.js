@@ -1,5 +1,6 @@
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class roomDisconnectHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
@@ -13,7 +14,7 @@ class roomDisconnectHandler extends serverEventHandlerBase {
             room.removeConnection(clientConnection);
             if (room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0) {
                 room.transferHost();
-                room.broadcast(responseEventsList.roomHostTransfered, JSON.stringify({ targetId: room.getHostClientId() }));
+                room.broadcast(responseEventsList.roomHostTransfered, JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
             }
             if (room.getConnectionsCount() > 0) {
                 room.transferAllObjects(clientConnection.getId(), room.getHostClientId());

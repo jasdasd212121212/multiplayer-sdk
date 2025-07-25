@@ -1,11 +1,12 @@
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class objectsUpdateHandler extends serverEventHandlerBase {
     constructor() {
         super(...arguments);
         this.name = "UpgradeObjects";
     }
     handle(message, sourceSocket) {
-        let parsed = JSON.parse(message);
+        let parsed = JsonCompressor.instance.parse(message);
         let currentRoom = this.server.getCachedConnection(sourceSocket);
         if (currentRoom != null) {
             let clientId = parsed.clientId;

@@ -1,12 +1,13 @@
 import { Socket } from "socket.io";
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { responseEventsList } from "../responseEventsList.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class getRoomsListHandler extends serverEventHandlerBase{
     name: string = "GetRooms";
 
     handle(message: string, sourceSocket: Socket): void {
-        sourceSocket.emit(responseEventsList.roomsList, JSON.stringify(this.server.getRoomsList()));
+        sourceSocket.emit(responseEventsList.roomsList, JsonCompressor.instance.stringify(this.server.getRoomsList()));
     }
 }
 

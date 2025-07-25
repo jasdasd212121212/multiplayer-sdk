@@ -3,6 +3,7 @@ import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { room } from "../../Room/room.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class roomDisconnectHandler extends serverEventHandlerBase {
     name: string = "disconnect";
@@ -18,7 +19,7 @@ class roomDisconnectHandler extends serverEventHandlerBase {
 
             if(room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0){
                 room.transferHost();
-                room.broadcast(responseEventsList.roomHostTransfered, JSON.stringify({ targetId: room.getHostClientId() }));
+                room.broadcast(responseEventsList.roomHostTransfered, JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
             }
 
             if(room.getConnectionsCount() > 0){

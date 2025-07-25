@@ -7,12 +7,13 @@ import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
 import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
 import { IObjectCreationPackege } from "./Interfaces/IObjectCreationPackege.js";
+import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class createObjectHandler extends serverEventHandlerBase{
     name: string = "CreateObject";
     
     handle(message: string, sourceSocket: Socket): void {
-        let parsed = <IObjectCreationPackege>JSON.parse(message);
+        let parsed = <IObjectCreationPackege>JsonCompressor.instance.parse(message);
 
         let assetPath: string = parsed.asset;
         let cguid: string = parsed.cguid;
@@ -25,7 +26,7 @@ class createObjectHandler extends serverEventHandlerBase{
             let creator: client = currentRoom.findClientBySocket(sourceSocket);
             let created: gameObject = currentRoom.instatiateObject(assetPath, position, rotation, creator);
 
-            currentRoom.broadcast(responseEventsList.objectCreated, JSON.stringify({
+            currentRoom.broadcast(responseEventsList.objectCreated, JsonCompressor.instance.stringify({
                 cguid: cguid,
                 data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll)
             }));

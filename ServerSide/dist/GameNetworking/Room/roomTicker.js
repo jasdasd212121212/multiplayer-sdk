@@ -1,3 +1,4 @@
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { responseEventsList } from "../Server/responseEventsList.js";
 import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
@@ -14,7 +15,7 @@ class roomTicker {
         if (this.netframeBuffer.isEmpty()) {
             this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
         }
-        this.attackhedRoom.broadcast(responseEventsList.objectsTick, JSON.stringify(this.attackhedRoom.getObjectsPackege(this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()), syncronizationPackegeGenerationOptions.syncOnlyTransfor)));
+        this.attackhedRoom.broadcast(responseEventsList.objectsTick, JsonCompressor.instance.stringify(this.attackhedRoom.getObjectsPackege(this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()), syncronizationPackegeGenerationOptions.syncOnlyTransfor)));
         this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
     }
 }

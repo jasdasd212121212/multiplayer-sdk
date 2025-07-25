@@ -8,6 +8,9 @@ import { roomCreationHandler } from "./GameNetworking/Server/Handlers/roomCreati
 import { roomDisconnectHandler } from "./GameNetworking/Server/Handlers/roomDisconnectHandler.js";
 import { roomJoinHandler } from "./GameNetworking/Server/Handlers/roomJoinHandler.js";
 import { server } from "./GameNetworking/Server/server.js";
+import { JsonCompressor } from "./Utils/JsonCompressor.js";
+
+JsonCompressor.init();
 
 let gameServer: server = new server();
 let handlers: Array<serverEventHandlerBase> = [];

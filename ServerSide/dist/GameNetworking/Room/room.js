@@ -3,6 +3,7 @@ import { gameObject } from "./gameObject.js";
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class room {
     constructor(id, roomName, additionalData) {
         this.objects = new Map();
@@ -108,7 +109,7 @@ class room {
                 transferdObjects.push(this.objectsArray[i].getObjectId());
             }
         }
-        this.broadcast(responseEventsList.objectsTransfered, JSON.stringify({
+        this.broadcast(responseEventsList.objectsTransfered, JsonCompressor.instance.stringify({
             tarnsferedToClient: destinationId,
             objects: transferdObjects
         }));
