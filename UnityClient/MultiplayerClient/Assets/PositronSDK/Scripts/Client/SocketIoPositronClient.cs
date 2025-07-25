@@ -1,13 +1,16 @@
+using SocketIOClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using SocketIOClient.Transport;
 
 namespace Positron
 {
     public class SocketIoPositronClient : IPositronClient
     {
         private List<IClientMessageHandler> _eventHandlers = new();
-        private SocketIOClientWithPerMessageDeflate.SocketIOClient _socket;
+        private SocketIOUnity _socket;
 
         public bool IsConnected => _socket != null && _socket.Connected;
 
@@ -15,15 +18,18 @@ namespace Positron
 
         public void ConnectToMaster(ClientSettings settings)
         {
-            _socket = new SocketIOClientWithPerMessageDeflate.SocketIOClient(settings.BuildURL());
+            Uri uri = new(settings.BuildURL());
+            SocketIOOptions options = new();
+            options.Transport = TransportProtocol.WebSocket;
+
+            _socket = new SocketIOUnity(uri, options);
+            _socket.ConnectAsync();
 
             _socket.On(EventNamesHolder.CONNECTED, (data) =>
             {
                 BindHandlersToSocket();
                 connected?.Invoke();
             });
-
-            _socket.ConnectAsync();
         }
 
         public void Send(string name, string content)
@@ -59,9 +65,17 @@ namespace Positron
 
         private void BindHandlerToSocket(IClientMessageHandler handler)
         {
-            _socket.On(handler.EventName, (string data) =>
+            _socket.On(handler.EventName, (SocketIOResponse data) =>
             {
-                handler.Process(data);
+                int length = data.Count;
+                StringBuilder result = new();
+
+                for (int i = 0; i < length; i++)
+                {
+                    result.Append(data.GetValue(i));
+                }
+
+                handler.Process(result.ToString());
             });
         }
     }

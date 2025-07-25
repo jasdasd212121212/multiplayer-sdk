@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e4a54f6b70cc664bb125e29ab003c48, type: 3}
   m_Name: ClientSettings
   m_EditorClassIdentifier: 
-  _protocol: http
+  _protocol: ws
   _remoteServerAddress: localhost
   _port: 7000
