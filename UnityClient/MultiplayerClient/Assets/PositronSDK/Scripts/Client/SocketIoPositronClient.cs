@@ -21,6 +21,8 @@ namespace Positron
             Uri uri = new(settings.BuildURL());
             SocketIOOptions options = new();
             options.Transport = TransportProtocol.WebSocket;
+            options.AutoUpgrade = false;
+            options.EIO = EngineIO.V4;
 
             _socket = new SocketIOUnity(uri, options);
             _socket.ConnectAsync();
