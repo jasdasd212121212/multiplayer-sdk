@@ -11,6 +11,7 @@ namespace Positron
     {
         private List<IClientMessageHandler> _eventHandlers = new();
         private SocketIOUnity _socket;
+        private BrotlitInteractor _interactor;
 
         public bool IsConnected => _socket != null && _socket.Connected;
 
@@ -18,6 +19,8 @@ namespace Positron
 
         public void ConnectToMaster(ClientSettings settings)
         {
+            _interactor = new();
+
             Uri uri = new(settings.BuildURL());
             SocketIOOptions options = new();
             options.Transport = TransportProtocol.WebSocket;
@@ -38,7 +41,7 @@ namespace Positron
         {
             if (_socket.Connected)
             {
-                _socket.EmitAsync(name, content);
+                _socket.EmitAsync(name, _interactor.CompressString(content));
             }
         }
 
@@ -77,7 +80,7 @@ namespace Positron
                     result.Append(data.GetValue(i));
                 }
 
-                handler.Process(result.ToString());
+                handler.Process(_interactor.DecompressString(result.ToString()));
             });
         }
     }
