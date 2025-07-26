@@ -2,23 +2,7 @@ import { room } from "../Room/room.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 const httpServer = createServer();
-const io = new Server(httpServer, {
-    perMessageDeflate: {
-        zlibDeflateOptions: {
-            chunkSize: 1024,
-            memLevel: 7,
-            level: 9
-        },
-        zlibInflateOptions: {
-            chunkSize: 1024
-        },
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
-        concurrencyLimit: 60,
-        threshold: 128
-    }
-});
+const io = new Server(httpServer);
 class server {
     constructor() {
         this.rooms = new Array();
