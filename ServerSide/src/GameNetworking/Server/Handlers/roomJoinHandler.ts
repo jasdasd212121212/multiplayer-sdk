@@ -10,8 +10,8 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class roomJoinHandler extends serverEventHandlerBase{
     name: string = "JoinRoom";
 
-    handle(message: string, sourceSocket: Socket): void {
-        let options = <IRoomJoinPackege>JsonCompressor.instance.parse(message);
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
+        let options = <IRoomJoinPackege> await JsonCompressor.instance.parse(message);
         let roomId: string = options.id;
 
         let room: room = this.server.findRoom(roomId);
@@ -24,7 +24,7 @@ class roomJoinHandler extends serverEventHandlerBase{
                 room.addConnection(clientConnection);
                 this.server.addCachedConnection(sourceSocket, room);
 
-                sourceSocket.emit(responseEventsList.clientConnected, JsonCompressor.instance.stringify({ 
+                sourceSocket.emit(responseEventsList.clientConnected, await JsonCompressor.instance.stringify({ 
                     clientId: clientId, 
                     hostId: room.getHostClientId(),
                     objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll) 

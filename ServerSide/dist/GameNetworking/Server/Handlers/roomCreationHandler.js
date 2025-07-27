@@ -7,14 +7,14 @@ class roomCreationHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "CreateRoom";
     }
-    handle(message, sourceSocket) {
-        let options = JsonCompressor.instance.parse(message);
+    async handle(message, sourceSocket) {
+        let options = await JsonCompressor.instance.parse(message);
         let isConnectedToAnyRoom = this.server.hasCachedConnection(sourceSocket);
         let guid = new Date().toISOString() + uuidv6();
         if (!isConnectedToAnyRoom) {
             console.log(`Room named: ${options.name} created with id: ${guid}`);
-            this.server.createRoom(guid, options.name, options.data);
-            sourceSocket.emit(responseEventsList.roomCreated, JsonCompressor.instance.stringify({ createdRoomId: guid }));
+            this.server.createRoom(guid, options.name, options.data, 10);
+            sourceSocket.emit(responseEventsList.roomCreated, await JsonCompressor.instance.stringify({ createdRoomId: guid }));
         }
         else {
             sourceSocket.emit(responseEventsList.roomCreationReject);

@@ -6,8 +6,8 @@ class getRoomsListHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "GetRooms";
     }
-    handle(message, sourceSocket) {
-        sourceSocket.emit(responseEventsList.roomsList, JsonCompressor.instance.stringify(this.server.getRoomsList()));
+    async handle(message, sourceSocket) {
+        sourceSocket.emit(responseEventsList.roomsList, await JsonCompressor.instance.stringify(this.server.getRoomsList()));
     }
 }
 export { getRoomsListHandler };

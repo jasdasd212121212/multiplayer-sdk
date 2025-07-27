@@ -16,15 +16,18 @@ class roomTicker{
     }
 
     public start(): void{
-        setInterval(() => { this.onTick(); }, 1000 / TICKRATE)
+        setInterval(async () => 
+            { 
+                await this.onTick(); 
+            }, 1000 / TICKRATE)
     }
 
-    public onTick(): void{
+    public async onTick(): Promise<void>{
         if(this.netframeBuffer.isEmpty()){
             this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
         }
         
-        this.attackhedRoom.broadcast(responseEventsList.objectsTick, JsonCompressor.instance.stringify(
+        this.attackhedRoom.broadcast(responseEventsList.objectsTick, await JsonCompressor.instance.stringify(
             this.attackhedRoom.getObjectsPackege(
                 this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()),
                 syncronizationPackegeGenerationOptions.syncOnlyTransfor

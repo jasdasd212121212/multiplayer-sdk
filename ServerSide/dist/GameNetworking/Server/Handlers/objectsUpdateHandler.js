@@ -5,8 +5,8 @@ class objectsUpdateHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "UpgradeObjects";
     }
-    handle(message, sourceSocket) {
-        let parsed = JsonCompressor.instance.parse(message);
+    async handle(message, sourceSocket) {
+        let parsed = await JsonCompressor.instance.parse(message);
         let currentRoom = this.server.getCachedConnection(sourceSocket);
         if (currentRoom != null) {
             let clientId = parsed.clientId;

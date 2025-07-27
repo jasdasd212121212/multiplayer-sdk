@@ -7,12 +7,12 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class raiseEventHandler extends serverEventHandlerBase{
     name: string = "RaiseEvent";
 
-    handle(message: string, sourceSocket: Socket): void {
-        let parsed: IRaiseEventPackege = <IRaiseEventPackege>JsonCompressor.instance.parse(message);
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
+        let parsed: IRaiseEventPackege = <IRaiseEventPackege> await JsonCompressor.instance.parse(message);
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if(currentRoom != null){
-            currentRoom.sendRaiseEvent(parsed, sourceSocket);
+            await currentRoom.sendRaiseEvent(parsed, sourceSocket);
         }
     }
 }

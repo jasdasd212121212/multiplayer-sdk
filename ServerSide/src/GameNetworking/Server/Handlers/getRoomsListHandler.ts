@@ -6,8 +6,8 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class getRoomsListHandler extends serverEventHandlerBase{
     name: string = "GetRooms";
 
-    handle(message: string, sourceSocket: Socket): void {
-        sourceSocket.emit(responseEventsList.roomsList, JsonCompressor.instance.stringify(this.server.getRoomsList()));
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
+        sourceSocket.emit(responseEventsList.roomsList, await JsonCompressor.instance.stringify(this.server.getRoomsList()));
     }
 }
 

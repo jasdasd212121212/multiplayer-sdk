@@ -6,14 +6,14 @@ class removeObjectHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "DeleteObject";
     }
-    handle(message, sourceSocket) {
-        let parsed = JsonCompressor.instance.parse(message);
+    async handle(message, sourceSocket) {
+        let parsed = await JsonCompressor.instance.parse(message);
         let currentRoom = this.server.getCachedConnection(sourceSocket);
         if (currentRoom != null) {
             let targetGameObject = currentRoom.findObject(parsed.id);
             if (targetGameObject != null && targetGameObject.getClientId() == parsed.client) {
                 currentRoom.removeObject(targetGameObject);
-                currentRoom.broadcast(responseEventsList.objectRemoved, JsonCompressor.instance.stringify({
+                currentRoom.broadcast(responseEventsList.objectRemoved, await JsonCompressor.instance.stringify({
                     id: parsed.id
                 }));
             }

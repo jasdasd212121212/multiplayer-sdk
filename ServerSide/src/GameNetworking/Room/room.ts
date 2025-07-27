@@ -19,11 +19,13 @@ class room{
     private nextId: number = 0;
     private nextObjectId: number = 0; 
     private hostClientId: number = -1;
+    private lastPlayerDisconnectTime: number;
+    private timeToLive: number; //seconds
 
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
 
-    constructor(id: string, roomName: string, additionalData: object){
+    constructor(id: string, roomName: string, additionalData: object, TTL: number){
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
@@ -31,6 +33,9 @@ class room{
         this.ticker = new roomTicker(this);
         this.raiseEventDispatcher = new raiseEventor(this);
 
+        this.timeToLive = TTL;
+        this.lastPlayerDisconnectTime = new Date().getTime();
+        
         this.ticker.start();
     }
 
@@ -50,8 +55,14 @@ class room{
         return this.hostClientId;
     }
 
-    public sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): void{
-        this.raiseEventDispatcher.sendEvent(event, sourceSocket);
+    public getRoomIsOutOfTimeToLive(): boolean{
+        let deltaTime: number = (new Date().getTime() - this.lastPlayerDisconnectTime) / 1000;
+
+        return deltaTime < this.timeToLive;
+    }
+
+    public async sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): Promise<void>{
+        await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
     }
 
     public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client): gameObject{
@@ -116,6 +127,8 @@ class room{
         if (index > -1) {
             this.clients.splice(index, 1);
         }
+
+        this.lastPlayerDisconnectTime = new Date().getTime();
     }
 
     public getConnection(index: number): client{
@@ -141,7 +154,7 @@ class room{
         return null;
     }
 
-    public transferAllObjects(sourceId: number, destinationId: number): void{
+    public async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
         let transferdObjects: Array<number> = [];
         
         for(let i: number = 0; i < this.objects.size; i++){
@@ -151,7 +164,7 @@ class room{
             }
         }
 
-        this.broadcast(responseEventsList.objectsTransfered, JsonCompressor.instance.stringify({
+        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
             tarnsferedToClient: destinationId, 
             objects: transferdObjects
         }));

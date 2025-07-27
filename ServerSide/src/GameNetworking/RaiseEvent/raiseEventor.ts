@@ -17,30 +17,30 @@ class raiseEventor{
         this.buffer = new raiseBuffer();
     }
 
-    public sendEvent(event: IRaiseEventPackege, sourceSocket: Socket): void{
-        this.send(event, sourceSocket, false);
+    public async sendEvent(event: IRaiseEventPackege, sourceSocket: Socket): Promise<void>{
+        await this.send(event, sourceSocket, false);
     }
 
-    public retryBuffer(): void{
+    public async retryBuffer(): Promise<void>{
         let wrappers: Array<raiseEventWrapper> = this.buffer.getBuffered();
 
         for(let i: number = 0; i < wrappers.length; i++){
-            this.send(wrappers[i].event, wrappers[i].socket, true);
+            await this.send(wrappers[i].event, wrappers[i].socket, true);
         }
     }
 
-    private send(event: IRaiseEventPackege, sourceSocket: Socket, isFromBuffer: boolean): void{
+    private async send(event: IRaiseEventPackege, sourceSocket: Socket, isFromBuffer: boolean): Promise<void>{
         let mustBuffer: boolean = this.isBufferizing(event);
         let targetType: number = event.targets;
 
         if(targetType == raiseEventsTargets.all || targetType == raiseEventsTargets.allBuffered){
-            this.sendAll(event);
+            await this.sendAll(event);
         }
         else if(targetType == raiseEventsTargets.others || targetType == raiseEventsTargets.othersBuffered){
-            this.sendOthers(event, sourceSocket);
+            await this.sendOthers(event, sourceSocket);
         }
         else if(targetType == raiseEventsTargets.target || targetType == raiseEventsTargets.targetBuffered){
-            this.sendToTarget(event);
+            await this.sendToTarget(event);
         }
         else{
             console.error("Undefined raise event target: " + targetType);
@@ -51,22 +51,22 @@ class raiseEventor{
         }
     }
 
-    private sendAll(event: IRaiseEventPackege): void{
-        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
+    private async sendAll(event: IRaiseEventPackege): Promise<void>{
+        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, await JsonCompressor.instance.stringify(event));
     }
 
-    private sendOthers(event: IRaiseEventPackege, source: Socket): void{
-        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event), source);
+    private async sendOthers(event: IRaiseEventPackege, source: Socket): Promise<void>{
+        this.attackhedRoom.castOthers(responseEventsList.raiseEvent, await JsonCompressor.instance.stringify(event), source);
     }   
 
-    private sendToTarget(event: IRaiseEventPackege): void{
+    private async sendToTarget(event: IRaiseEventPackege): Promise<void>{
         let targetClient: number = event.targetClient;
 
         for(let i: number = 0; i < this.attackhedRoom.getConnectionsCount(); i++){
             let currentClient: client = this.attackhedRoom.getConnection(i);
 
             if(currentClient.getId() == targetClient){
-                currentClient.getSocket().emit(responseEventsList.raiseEvent, JsonCompressor.instance.stringify(event));
+                currentClient.getSocket().emit(responseEventsList.raiseEvent, await JsonCompressor.instance.stringify(event));
             }
         }
     }

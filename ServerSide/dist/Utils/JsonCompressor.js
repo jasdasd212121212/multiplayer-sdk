@@ -1,5 +1,5 @@
 import { promisify } from 'util';
-import { brotliCompressSync, brotliDecompressSync, brotliCompress, brotliDecompress } from 'zlib';
+import { brotliCompress, brotliDecompress } from 'zlib';
 class JsonCompressor {
     constructor() {
         this.compressPromise = promisify(brotliCompress);
@@ -10,21 +10,14 @@ class JsonCompressor {
             JsonCompressor.instance = new JsonCompressor();
         }
     }
-    stringify(input) {
+    async stringify(input) {
         let jsonString = JSON.stringify(input);
-        jsonString = this.compressString(jsonString);
+        jsonString = await this.compressAsync(jsonString);
         return jsonString;
     }
-    parse(input) {
-        let unpacked = this.decompressString(input);
+    async parse(input) {
+        let unpacked = await this.decompressAsync(input);
         return JSON.parse(unpacked);
-    }
-    compressString(str) {
-        const compressedBuffer = brotliCompressSync(str).toString('base64');
-        return compressedBuffer;
-    }
-    decompressString(str) {
-        return brotliDecompressSync(Buffer.from(str, 'base64')).toString();
     }
     async compressAsync(str) {
         try {

@@ -9,13 +9,15 @@ class roomTicker {
         this.netframeBuffer = new netframe();
     }
     start() {
-        setInterval(() => { this.onTick(); }, 1000 / TICKRATE);
+        setInterval(async () => {
+            await this.onTick();
+        }, 1000 / TICKRATE);
     }
-    onTick() {
+    async onTick() {
         if (this.netframeBuffer.isEmpty()) {
             this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
         }
-        this.attackhedRoom.broadcast(responseEventsList.objectsTick, JsonCompressor.instance.stringify(this.attackhedRoom.getObjectsPackege(this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()), syncronizationPackegeGenerationOptions.syncOnlyTransfor)));
+        this.attackhedRoom.broadcast(responseEventsList.objectsTick, await JsonCompressor.instance.stringify(this.attackhedRoom.getObjectsPackege(this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()), syncronizationPackegeGenerationOptions.syncOnlyTransfor)));
         this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
     }
 }

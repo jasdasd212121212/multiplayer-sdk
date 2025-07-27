@@ -12,8 +12,8 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class createObjectHandler extends serverEventHandlerBase{
     name: string = "CreateObject";
     
-    handle(message: string, sourceSocket: Socket): void {
-        let parsed = <IObjectCreationPackege>JsonCompressor.instance.parse(message);
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
+        let parsed = <IObjectCreationPackege>await JsonCompressor.instance.parse(message);
 
         let assetPath: string = parsed.asset;
         let cguid: string = parsed.cguid;
@@ -26,7 +26,7 @@ class createObjectHandler extends serverEventHandlerBase{
             let creator: client = currentRoom.findClientBySocket(sourceSocket);
             let created: gameObject = currentRoom.instatiateObject(assetPath, position, rotation, creator);
 
-            currentRoom.broadcast(responseEventsList.objectCreated, JsonCompressor.instance.stringify({
+            currentRoom.broadcast(responseEventsList.objectCreated, await JsonCompressor.instance.stringify({
                 cguid: cguid,
                 data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll)
             }));

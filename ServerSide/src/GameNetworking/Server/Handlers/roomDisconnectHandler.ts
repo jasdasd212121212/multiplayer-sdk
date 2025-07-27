@@ -8,7 +8,7 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class roomDisconnectHandler extends serverEventHandlerBase {
     name: string = "disconnect";
 
-    handle(message: string, sourceSocket: Socket): void {
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
         let room: room = this.server.getCachedConnection(sourceSocket);
         let clientConnection: client = null;
 
@@ -19,11 +19,11 @@ class roomDisconnectHandler extends serverEventHandlerBase {
 
             if(room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0){
                 room.transferHost();
-                room.broadcast(responseEventsList.roomHostTransfered, JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
+                room.broadcast(responseEventsList.roomHostTransfered, await JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
             }
 
             if(room.getConnectionsCount() > 0){
-                room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
+                await room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
             }
 
             this.server.deleteCachedConnection(sourceSocket);

@@ -9,7 +9,7 @@ abstract class serverEventHandlerBase{
         this.server = server;
     }
 
-    abstract handle(message: string, sourceSocket: Socket): void;
+    abstract handle(message: string, sourceSocket: Socket): Promise<void>;
 }
 
 export { serverEventHandlerBase }

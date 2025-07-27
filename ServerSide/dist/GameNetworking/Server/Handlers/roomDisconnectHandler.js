@@ -6,7 +6,7 @@ class roomDisconnectHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "disconnect";
     }
-    handle(message, sourceSocket) {
+    async handle(message, sourceSocket) {
         let room = this.server.getCachedConnection(sourceSocket);
         let clientConnection = null;
         if (room != null && room != undefined) {
@@ -14,10 +14,10 @@ class roomDisconnectHandler extends serverEventHandlerBase {
             room.removeConnection(clientConnection);
             if (room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0) {
                 room.transferHost();
-                room.broadcast(responseEventsList.roomHostTransfered, JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
+                room.broadcast(responseEventsList.roomHostTransfered, await JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
             }
             if (room.getConnectionsCount() > 0) {
-                room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
+                await room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
             }
             this.server.deleteCachedConnection(sourceSocket);
             console.log(`Client: ${clientConnection.getId()} was disconnected from room: ${room.getId()}`);

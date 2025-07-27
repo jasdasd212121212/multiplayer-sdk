@@ -5,7 +5,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class room {
-    constructor(id, roomName, additionalData) {
+    constructor(id, roomName, additionalData, TTL) {
         this.objects = new Map();
         this.objectsArray = [];
         this.clients = [];
@@ -19,6 +19,8 @@ class room {
         this.externalData = additionalData;
         this.ticker = new roomTicker(this);
         this.raiseEventDispatcher = new raiseEventor(this);
+        this.timeToLive = TTL;
+        this.lastPlayerDisconnectTime = new Date().getTime();
         this.ticker.start();
     }
     getName() {
@@ -33,8 +35,12 @@ class room {
     getHostClientId() {
         return this.hostClientId;
     }
-    sendRaiseEvent(event, sourceSocket) {
-        this.raiseEventDispatcher.sendEvent(event, sourceSocket);
+    getRoomIsOutOfTimeToLive() {
+        let deltaTime = (new Date().getTime() - this.lastPlayerDisconnectTime) / 1000;
+        return deltaTime < this.timeToLive;
+    }
+    async sendRaiseEvent(event, sourceSocket) {
+        await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
     }
     instatiateObject(assetPath, position, rotation, creator) {
         let created = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);
@@ -82,6 +88,7 @@ class room {
         if (index > -1) {
             this.clients.splice(index, 1);
         }
+        this.lastPlayerDisconnectTime = new Date().getTime();
     }
     getConnection(index) {
         return this.clients[index];
@@ -101,7 +108,7 @@ class room {
         }
         return null;
     }
-    transferAllObjects(sourceId, destinationId) {
+    async transferAllObjects(sourceId, destinationId) {
         let transferdObjects = [];
         for (let i = 0; i < this.objects.size; i++) {
             if (this.objectsArray[i].getClientId() == sourceId) {
@@ -109,7 +116,7 @@ class room {
                 transferdObjects.push(this.objectsArray[i].getObjectId());
             }
         }
-        this.broadcast(responseEventsList.objectsTransfered, JsonCompressor.instance.stringify({
+        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
             tarnsferedToClient: destinationId,
             objects: transferdObjects
         }));

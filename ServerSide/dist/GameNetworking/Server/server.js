@@ -19,17 +19,17 @@ class server {
             console.log("new connection");
             user.emit("connected");
             for (let i = 0; i < this.handlers.length; i++) {
-                user.on(this.handlers[i].name, (data) => {
-                    this.handlers[i].handle(data, user);
+                user.on(this.handlers[i].name, async (data) => {
+                    await this.handlers[i].handle(data, user);
                 });
             }
         });
         setInterval(() => {
-            //this.filterEmptyRooms(this.rooms); TODO: make filtering by creation date and TTL
+            this.filterEmptyRooms(this.rooms);
         }, 10000);
     }
-    createRoom(id, name, data) {
-        this.rooms.push(new room(id, name, data));
+    createRoom(id, name, data, timeToLive) {
+        this.rooms.push(new room(id, name, data, timeToLive));
     }
     findRoom(id) {
         for (let i = 0; i < this.rooms.length; i++) {
@@ -67,7 +67,7 @@ class server {
             return;
         }
         for (let i = 0; i < rooms.length; i++) {
-            if (rooms[i].getConnectionsCount() == 0) {
+            if (rooms[i].getConnectionsCount() == 0 && rooms[i].getRoomIsOutOfTimeToLive()) {
                 const index = rooms.indexOf(rooms[i], 0);
                 if (index > -1) {
                     rooms.splice(index, 1);

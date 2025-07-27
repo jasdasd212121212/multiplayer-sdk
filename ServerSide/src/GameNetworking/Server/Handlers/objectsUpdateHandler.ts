@@ -9,8 +9,8 @@ import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class objectsUpdateHandler extends serverEventHandlerBase{
     name: string = "UpgradeObjects";
 
-    handle(message: string, sourceSocket: Socket): void {
-        let parsed: IObjectUpgradePackege = <IObjectUpgradePackege>JsonCompressor.instance.parse(message);
+    async handle(message: string, sourceSocket: Socket): Promise<void> {
+        let parsed: IObjectUpgradePackege = <IObjectUpgradePackege> await JsonCompressor.instance.parse(message);
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if(currentRoom != null){

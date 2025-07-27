@@ -8,8 +8,8 @@ class roomJoinHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "JoinRoom";
     }
-    handle(message, sourceSocket) {
-        let options = JsonCompressor.instance.parse(message);
+    async handle(message, sourceSocket) {
+        let options = await JsonCompressor.instance.parse(message);
         let roomId = options.id;
         let room = this.server.findRoom(roomId);
         if (room != null) {
@@ -18,7 +18,7 @@ class roomJoinHandler extends serverEventHandlerBase {
                 let clientConnection = new client(clientId, sourceSocket);
                 room.addConnection(clientConnection);
                 this.server.addCachedConnection(sourceSocket, room);
-                sourceSocket.emit(responseEventsList.clientConnected, JsonCompressor.instance.stringify({
+                sourceSocket.emit(responseEventsList.clientConnected, await JsonCompressor.instance.stringify({
                     clientId: clientId,
                     hostId: room.getHostClientId(),
                     objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll)

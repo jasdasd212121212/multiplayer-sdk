@@ -7,8 +7,8 @@ class createObjectHandler extends serverEventHandlerBase {
         super(...arguments);
         this.name = "CreateObject";
     }
-    handle(message, sourceSocket) {
-        let parsed = JsonCompressor.instance.parse(message);
+    async handle(message, sourceSocket) {
+        let parsed = await JsonCompressor.instance.parse(message);
         let assetPath = parsed.asset;
         let cguid = parsed.cguid;
         let position = parsed.position;
@@ -17,7 +17,7 @@ class createObjectHandler extends serverEventHandlerBase {
         if (currentRoom != null) {
             let creator = currentRoom.findClientBySocket(sourceSocket);
             let created = currentRoom.instatiateObject(assetPath, position, rotation, creator);
-            currentRoom.broadcast(responseEventsList.objectCreated, JsonCompressor.instance.stringify({
+            currentRoom.broadcast(responseEventsList.objectCreated, await JsonCompressor.instance.stringify({
                 cguid: cguid,
                 data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll)
             }));
