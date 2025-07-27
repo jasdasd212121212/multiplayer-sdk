@@ -7,6 +7,7 @@ request: CreateRoom
 ```
 {
     "name": "any name",
+    "scene": -1,
     "data": {
         "any_key": "any values etc."
     }
@@ -35,6 +36,7 @@ response: joined
 {
     "clientId": -1,
     "hostId": -1,
+    "scene": -1,
     "objects": {
         o: [
             {
@@ -133,6 +135,24 @@ response: roomsList
             }
         }
     ]
+}
+```
+
+
+
+
+## Change scene
+request: ChangeScene
+```
+{
+    "newSceneIndex": -1
+}
+```
+
+response: roomSceneChanged
+```
+{
+    "newSceneIndexOfRoom": -1
 }
 ```
 

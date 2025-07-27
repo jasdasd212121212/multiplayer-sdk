@@ -21,11 +21,12 @@ class room{
     private hostClientId: number = -1;
     private lastPlayerDisconnectTime: number;
     private timeToLive: number; //seconds
+    private scene: number;
 
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
 
-    constructor(id: string, roomName: string, additionalData: object, TTL: number){
+    constructor(id: string, roomName: string, additionalData: object, TTL: number, sceneIndex: number){
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
@@ -36,6 +37,8 @@ class room{
         this.timeToLive = TTL;
         this.lastPlayerDisconnectTime = new Date().getTime();
         
+        this.scene = sceneIndex;
+
         this.ticker.start();
     }
 
@@ -61,8 +64,17 @@ class room{
         return deltaTime < this.timeToLive;
     }
 
+    public getScene(): number{
+        return this.scene;
+    }
+
     public async sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): Promise<void>{
         await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
+    }
+
+    public async changeScene(newScene: number): Promise<void>{
+        this.scene = newScene;
+        this.broadcast(responseEventsList.sceneChanged, await JsonCompressor.instance.stringify({newSceneIndexOfRoom: this.scene}));
     }
 
     public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client): gameObject{

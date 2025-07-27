@@ -10,5 +10,6 @@ export const responseEventsList = {
     roomCreationReject: "roomCreateReject",
     objectRemoved: "objectDeleted",
     roomsList: "roomsList",
-    raiseEvent: "raiseEvent"
+    raiseEvent: "raiseEvent",
+    sceneChanged: "roomSceneChanged"
 }

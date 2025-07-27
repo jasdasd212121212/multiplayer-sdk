@@ -2,7 +2,12 @@ import { room } from "../Room/room.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 const httpServer = createServer();
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*"
+    },
+    transports: ['websocket']
+});
 class server {
     constructor() {
         this.rooms = new Array();
@@ -28,8 +33,8 @@ class server {
             this.filterEmptyRooms(this.rooms);
         }, 10000);
     }
-    createRoom(id, name, data, timeToLive) {
-        this.rooms.push(new room(id, name, data, timeToLive));
+    createRoom(id, name, data, timeToLive, scene) {
+        this.rooms.push(new room(id, name, data, timeToLive, scene));
     }
     findRoom(id) {
         for (let i = 0; i < this.rooms.length; i++) {

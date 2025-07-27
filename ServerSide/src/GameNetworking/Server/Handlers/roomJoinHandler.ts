@@ -27,6 +27,7 @@ class roomJoinHandler extends serverEventHandlerBase{
                 sourceSocket.emit(responseEventsList.clientConnected, await JsonCompressor.instance.stringify({ 
                     clientId: clientId, 
                     hostId: room.getHostClientId(),
+                    scene: room.getScene(),
                     objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll) 
                 }));
 

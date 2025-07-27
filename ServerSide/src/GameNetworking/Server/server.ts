@@ -4,7 +4,12 @@ import { createServer } from "http";
 import { serverEventHandlerBase } from "./Handlers/Base/serverEventHandlerBase.js";
 
 const httpServer = createServer();
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*"
+    },
+    transports: ['websocket']
+});
 
 class server{
     private rooms: Array<room> = new Array<room>();
@@ -36,8 +41,8 @@ class server{
         }, 10000); 
     }
 
-    public createRoom(id: string, name: string, data: object, timeToLive: number){
-        this.rooms.push(new room(id, name, data, timeToLive));
+    public createRoom(id: string, name: string, data: object, timeToLive: number, scene: number){
+        this.rooms.push(new room(id, name, data, timeToLive, scene));
     }
 
     public findRoom(id: string): room{

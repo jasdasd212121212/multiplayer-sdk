@@ -5,7 +5,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class room {
-    constructor(id, roomName, additionalData, TTL) {
+    constructor(id, roomName, additionalData, TTL, sceneIndex) {
         this.objects = new Map();
         this.objectsArray = [];
         this.clients = [];
@@ -21,6 +21,7 @@ class room {
         this.raiseEventDispatcher = new raiseEventor(this);
         this.timeToLive = TTL;
         this.lastPlayerDisconnectTime = new Date().getTime();
+        this.scene = sceneIndex;
         this.ticker.start();
     }
     getName() {
@@ -39,8 +40,15 @@ class room {
         let deltaTime = (new Date().getTime() - this.lastPlayerDisconnectTime) / 1000;
         return deltaTime < this.timeToLive;
     }
+    getScene() {
+        return this.scene;
+    }
     async sendRaiseEvent(event, sourceSocket) {
         await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
+    }
+    async changeScene(newScene) {
+        this.scene = newScene;
+        this.broadcast(responseEventsList.sceneChanged, await JsonCompressor.instance.stringify({ newSceneIndexOfRoom: this.scene }));
     }
     instatiateObject(assetPath, position, rotation, creator) {
         let created = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);

@@ -1,4 +1,5 @@
 import { serverEventHandlerBase } from "./GameNetworking/Server/Handlers/Base/serverEventHandlerBase.js";
+import { changeRoomSceneHandler } from "./GameNetworking/Server/Handlers/changeRoomSceneHandler.js";
 import { createObjectHandler } from "./GameNetworking/Server/Handlers/createObjectHandler.js";
 import { getRoomsListHandler } from "./GameNetworking/Server/Handlers/getRoomsListHandler.js";
 import { objectsUpdateHandler } from "./GameNetworking/Server/Handlers/objectsUpdateHandler.js";
@@ -23,6 +24,7 @@ handlers.push(new objectsUpdateHandler(gameServer));
 handlers.push(new removeObjectHandler(gameServer));
 handlers.push(new getRoomsListHandler(gameServer));
 handlers.push(new raiseEventHandler(gameServer));
+handlers.push(new changeRoomSceneHandler(gameServer));
 
 gameServer.initHandlers(handlers);
 gameServer.start(); 
