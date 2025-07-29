@@ -3,6 +3,7 @@ import { server } from "../../server.js";
 
 abstract class serverEventHandlerBase{
     abstract name: string;
+    public altEvents: Array<string> = null;
     protected server: server;
 
     constructor(server: server){

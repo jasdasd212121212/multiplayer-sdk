@@ -1,17 +1,17 @@
-import { Socket } from "socket.io";
-import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { IObjectUpgradePackege } from "./Interfaces/IObjectUpgradePackege.js";
-import { room } from "../../Room/room.js";
 import { ISyncPackegeObject } from "./Interfaces/ISyncPackegeObject.js";
-import { gameObject } from "../../Room/gameObject.js";
-import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { udpHandlerBase } from "./Base/udpHandlerBase.js";
+import { udpEventsList } from "../udpEventsList.js";
+import { room } from "../../GameNetworking/Room/room.js";
+import { gameObject } from "../../GameNetworking/Room/gameObject.js";
 
-class objectsUpdateHandler extends serverEventHandlerBase{
-    name: string = "UpgradeObjects";
+class objectsUpdateHandler extends udpHandlerBase{
+    public event: number = udpEventsList.updateObjects;
 
-    async handle(message: string, sourceSocket: Socket): Promise<void> {
+    public async handle(message: string, ip: string, port: number): Promise<void> {
         let parsed: IObjectUpgradePackege = <IObjectUpgradePackege> await JsonCompressor.instance.parse(message);
-        let currentRoom: room = this.server.getCachedConnection(sourceSocket);
+        let currentRoom: room = this.gameServer.getCachedConnectionById(this.udpServer.getBindedIoByPort(port));
 
         if(currentRoom != null){
             let clientId: number = parsed.clientId;

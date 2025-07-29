@@ -2,6 +2,17 @@
 
 ### Server API
 
+## Connect
+request: standart socket.io connection
+
+resonse: connected
+```
+{
+    "udp": -1
+}
+```
+udp: UDP port from 40000 to 60000
+
 ## Creater room
 request: CreateRoom
 ```
@@ -82,12 +93,12 @@ EMPTY
 
 
 ## Disconnect while in room (Or leave)
-request: disconnect
+request: disconnect or LeaveRoom
 ```
 EMPTY
 ```
 
-response: standart disconnect
+response: standart disconnect or roomLeaved
 ```
 EMPTY
 ```
@@ -201,31 +212,6 @@ response: objectCreated
 }
 ```
 
-## Update objects
-request: UpgradeObjects
-```
-{
-    "clientId": 1,
-     
-    "o": [
-        {
-            "i": 0,
-            "p": {"x": 1, "y": 2, "z": 3},
-            "r": {"x": 1, "y": 2, "z": 3}
-        },
-        {
-            "i": 1,
-            "p": {"x": 1, "y": 2, "z": 3},
-            "r": {"x": 1, "y": 2, "z": 3}
-        }
-    ]
-}
-```
-response: NONE
-```
-EMPTY
-```
-
 ## Remove object
 request: DeleteObject
 ```
@@ -272,8 +258,37 @@ response: raiseEvent
 }
 ```
 
+
+
+# UDP events
+## Update objects
+code: 1
+```
+{
+    "clientId": 1,
+     
+    "o": [
+        {
+            "i": 0,
+            "p": {"x": 1, "y": 2, "z": 3},
+            "r": {"x": 1, "y": 2, "z": 3}
+        },
+        {
+            "i": 1,
+            "p": {"x": 1, "y": 2, "z": 3},
+            "r": {"x": 1, "y": 2, "z": 3}
+        }
+    ]
+}
+```
+code: NONE
+```
+EMPTY
+```
+
+
 ## On Tick
-response: objectsTick
+code: 2
 ```
 {
     "o": [
@@ -285,4 +300,32 @@ response: objectsTick
     ]
 }
 ```
-Note: server respond ONLY update object in comparison to previous netframe
+Note: server respond ONLY updated objects in comparison to previous netframe
+
+# UDP connection features
+This udp sub server requires confirmation of UDP connection. Client sends packeges with datagrams (array of bytes) 
+```
+[0]
+```
+Server responds:
+```
+connected
+```
+
+If all succesfully connection are confirmed and ready to work.
+
+All UDP connections bind port to given UDP port from main Socket.io server (In range 40000 to 60000)
+
+
+# About Brotlit server side compression
+Because unity socket io client does not work with perMessageDeflate i decided to integrate Brot;it compression.
+
+#### Case if message <256 bytes
+```
+NCNC;;; <any JSON here>
+```
+
+#### If message >256 bytes
+```
+All message will compressed with brotlit
+```

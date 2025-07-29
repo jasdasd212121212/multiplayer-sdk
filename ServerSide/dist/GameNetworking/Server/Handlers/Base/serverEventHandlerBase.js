@@ -1,5 +1,6 @@
 class serverEventHandlerBase {
     constructor(server) {
+        this.altEvents = null;
         this.server = server;
     }
 }

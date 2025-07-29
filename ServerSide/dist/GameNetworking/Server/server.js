@@ -1,6 +1,8 @@
 import { room } from "../Room/room.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
+const host = "localhost";
+const port = 7000;
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
@@ -9,32 +11,49 @@ const io = new Server(httpServer, {
     transports: ['websocket']
 });
 class server {
-    constructor() {
+    constructor(UdpServer) {
         this.rooms = new Array();
         this.cachedConnections = new Map();
+        this.gameUdpServer = null;
+        this.gameUdpServer = UdpServer;
     }
     initHandlers(Handlers) {
         this.handlers = Handlers;
     }
     start() {
-        httpServer.listen(7000, () => {
-            console.log("Server started!");
+        httpServer.listen(port, host, () => {
+            console.log("Server started. Host: " + host + " Port: " + port);
         });
+        this.gameUdpServer.startServer(host, port + 1);
         io.on("connection", (user) => {
-            console.log("new connection");
-            user.emit("connected");
+            let udpPort = this.gameUdpServer.bindIo(user.id);
+            console.log("new connection. UDP port: " + udpPort);
+            user.emit("connected", JSON.stringify({ udp: udpPort }));
             for (let i = 0; i < this.handlers.length; i++) {
                 user.on(this.handlers[i].name, async (data) => {
                     await this.handlers[i].handle(data, user);
                 });
+                if (this.handlers[i].altEvents != null) {
+                    for (let j = 0; j < this.handlers[i].altEvents.length; j++) {
+                        user.on(this.handlers[i].altEvents[j], async (data) => {
+                            await this.handlers[i].handle(data, user);
+                        });
+                    }
+                }
             }
+            user.on("disconnect", () => {
+                this.gameUdpServer.disposeIoPort(user.id);
+            });
         });
         setInterval(() => {
             this.filterEmptyRooms(this.rooms);
         }, 10000);
     }
+    udpSend(code, message, target) {
+        this.gameUdpServer.send(target.id, code, message);
+    }
     createRoom(id, name, data, timeToLive, scene) {
-        this.rooms.push(new room(id, name, data, timeToLive, scene));
+        this.rooms.push(new room(id, name, data, timeToLive, scene, this));
     }
     findRoom(id) {
         for (let i = 0; i < this.rooms.length; i++) {
@@ -51,7 +70,10 @@ class server {
         this.cachedConnections.delete(clientSocket.id);
     }
     getCachedConnection(clientSocket) {
-        return this.cachedConnections.get(clientSocket.id);
+        return this.getCachedConnectionById(clientSocket.id);
+    }
+    getCachedConnectionById(clientId) {
+        return this.cachedConnections.get(clientId);
     }
     hasCachedConnection(clientSocket) {
         return this.cachedConnections.has(clientSocket.id);

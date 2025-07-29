@@ -1,4 +1,4 @@
-import { vector3 } from "../../../vector3.js";
+import { vector3 } from "../../../GameNetworking/vector3.js";
 
 interface ISyncPackegeObject{
     i: number;

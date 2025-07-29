@@ -4,9 +4,16 @@ import { room } from "../../Room/room.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
 import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
+import { server } from "../server.js";
 
 class roomDisconnectHandler extends serverEventHandlerBase {
     name: string = "disconnect";
+
+    constructor(server: server){
+        super(server);
+
+        this.altEvents = ["LeaveRoom"];
+    }
 
     async handle(message: string, sourceSocket: Socket): Promise<void> {
         let room: room = this.server.getCachedConnection(sourceSocket);
@@ -29,6 +36,13 @@ class roomDisconnectHandler extends serverEventHandlerBase {
             this.server.deleteCachedConnection(sourceSocket);
 
             console.log(`Client: ${clientConnection.getId()} was disconnected from room: ${room.getId()}`);
+
+            try{
+                if(sourceSocket.connected){
+                    sourceSocket.emit(responseEventsList.roomLeaved);
+                }
+            }
+            catch {}
         }
 
         room = null;

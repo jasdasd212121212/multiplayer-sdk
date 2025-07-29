@@ -5,7 +5,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class room {
-    constructor(id, roomName, additionalData, TTL, sceneIndex) {
+    constructor(id, roomName, additionalData, TTL, sceneIndex, server) {
         this.objects = new Map();
         this.objectsArray = [];
         this.clients = [];
@@ -14,6 +14,7 @@ class room {
         this.hostClientId = -1;
         this.ticker = null;
         this.raiseEventDispatcher = null;
+        this.gameServer = null;
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
@@ -22,6 +23,7 @@ class room {
         this.timeToLive = TTL;
         this.lastPlayerDisconnectTime = new Date().getTime();
         this.scene = sceneIndex;
+        this.gameServer = server;
         this.ticker.start();
     }
     getName() {
@@ -136,6 +138,11 @@ class room {
     broadcast(event, message) {
         for (let i = 0; i < this.clients.length; i++) {
             this.clients[i].getSocket().emit(event, message);
+        }
+    }
+    broadcastUdp(event, message) {
+        for (let i = 0; i < this.clients.length; i++) {
+            this.gameServer.udpSend(event, message, this.clients[i].getSocket());
         }
     }
     castOthers(event, message, sourceSocket) {

@@ -11,6 +11,7 @@ export const responseEventsList = {
     objectRemoved: "objectDeleted",
     roomsList: "roomsList",
     raiseEvent: "raiseEvent",
-    sceneChanged: "roomSceneChanged"
+    sceneChanged: "roomSceneChanged",
+    roomLeaved: "roomLeaved"
 };
 //# sourceMappingURL=responseEventsList.js.map

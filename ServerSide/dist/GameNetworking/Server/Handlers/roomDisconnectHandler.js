@@ -2,9 +2,10 @@ import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 class roomDisconnectHandler extends serverEventHandlerBase {
-    constructor() {
-        super(...arguments);
+    constructor(server) {
+        super(server);
         this.name = "disconnect";
+        this.altEvents = ["LeaveRoom"];
     }
     async handle(message, sourceSocket) {
         let room = this.server.getCachedConnection(sourceSocket);
@@ -21,6 +22,12 @@ class roomDisconnectHandler extends serverEventHandlerBase {
             }
             this.server.deleteCachedConnection(sourceSocket);
             console.log(`Client: ${clientConnection.getId()} was disconnected from room: ${room.getId()}`);
+            try {
+                if (sourceSocket.connected) {
+                    sourceSocket.emit(responseEventsList.roomLeaved);
+                }
+            }
+            catch { }
         }
         room = null;
         clientConnection = null;

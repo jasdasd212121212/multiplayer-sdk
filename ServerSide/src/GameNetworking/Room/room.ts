@@ -8,6 +8,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { server } from "../Server/server.js";
 
 class room{
     private name: string;
@@ -26,7 +27,9 @@ class room{
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
 
-    constructor(id: string, roomName: string, additionalData: object, TTL: number, sceneIndex: number){
+    private gameServer: server = null;
+
+    constructor(id: string, roomName: string, additionalData: object, TTL: number, sceneIndex: number, server: server){
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
@@ -38,6 +41,8 @@ class room{
         this.lastPlayerDisconnectTime = new Date().getTime();
         
         this.scene = sceneIndex;
+
+        this.gameServer = server;
 
         this.ticker.start();
     }
@@ -191,6 +196,12 @@ class room{
     public broadcast(event: string, message: string): void{
         for(let i: number = 0; i < this.clients.length; i++){
             this.clients[i].getSocket().emit(event, message);
+        }
+    }
+
+    public broadcastUdp(event: number, message: string){
+        for(let i: number = 0; i < this.clients.length; i++){
+            this.gameServer.udpSend(event, message, this.clients[i].getSocket());
         }
     }
 

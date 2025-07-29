@@ -1,22 +1,42 @@
 import { promisify } from 'util';
 import { brotliCompress, brotliDecompress } from 'zlib';
+const nonCompressMark = "NCNC";
+const nonCompressMarkSeparator = ";;;";
 class JsonCompressor {
-    constructor() {
+    constructor(thrashold) {
+        this.compressionThrashold = 0;
         this.compressPromise = promisify(brotliCompress);
         this.decompressPromise = promisify(brotliDecompress);
+        this.compressionThrashold = thrashold;
     }
-    static init() {
+    static init(compressThrashold) {
         if (JsonCompressor.instance == null) {
-            JsonCompressor.instance = new JsonCompressor();
+            JsonCompressor.instance = new JsonCompressor(compressThrashold);
         }
     }
     async stringify(input) {
         let jsonString = JSON.stringify(input);
-        jsonString = await this.compressAsync(jsonString);
+        if (jsonString.length > this.compressionThrashold) {
+            jsonString = await this.compressAsync(jsonString);
+        }
+        else {
+            jsonString = nonCompressMark + nonCompressMarkSeparator + jsonString;
+        }
         return jsonString;
     }
     async parse(input) {
-        let unpacked = await this.decompressAsync(input);
+        let unpacked = "";
+        let splitted = [];
+        let markSection = this.getMarkSection(input);
+        if (markSection == nonCompressMark + nonCompressMarkSeparator) {
+            splitted = input.split(nonCompressMarkSeparator);
+            if (splitted[0] == nonCompressMark) {
+                unpacked = splitted[1];
+            }
+        }
+        else {
+            unpacked = await this.decompressAsync(input);
+        }
         return JSON.parse(unpacked);
     }
     async compressAsync(str) {
@@ -38,6 +58,10 @@ class JsonCompressor {
             console.error("Brotli decompression failed:", error);
             return "";
         }
+    }
+    getMarkSection(source) {
+        let len = nonCompressMark.length + nonCompressMarkSeparator.length;
+        return source.substring(0, len);
     }
 }
 export { JsonCompressor };
