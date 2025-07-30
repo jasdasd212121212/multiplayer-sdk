@@ -66,7 +66,7 @@ class room{
     public getRoomIsOutOfTimeToLive(): boolean{
         let deltaTime: number = (new Date().getTime() - this.lastPlayerDisconnectTime) / 1000;
 
-        return deltaTime < this.timeToLive;
+        return deltaTime > this.timeToLive;
     }
 
     public getScene(): number{

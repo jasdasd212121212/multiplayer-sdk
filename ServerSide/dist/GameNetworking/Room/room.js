@@ -40,7 +40,7 @@ class room {
     }
     getRoomIsOutOfTimeToLive() {
         let deltaTime = (new Date().getTime() - this.lastPlayerDisconnectTime) / 1000;
-        return deltaTime < this.timeToLive;
+        return deltaTime > this.timeToLive;
     }
     getScene() {
         return this.scene;

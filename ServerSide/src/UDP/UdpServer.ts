@@ -56,9 +56,6 @@ class UdpServer{
 
             socket.send(messageBuffer, clientInfo.getPort(), clientInfo.getIp());
         }
-        else{
-            console.log("nr");
-        }
     }
 
     public startServer(host: string, port: number): void{

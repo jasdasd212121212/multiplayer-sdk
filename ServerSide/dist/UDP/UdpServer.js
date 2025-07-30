@@ -41,9 +41,6 @@ class UdpServer {
             messageBuffer[0] = code;
             socket.send(messageBuffer, clientInfo.getPort(), clientInfo.getIp());
         }
-        else {
-            console.log("nr");
-        }
     }
     startServer(host, port) {
         socket.bind(port, host, () => {
