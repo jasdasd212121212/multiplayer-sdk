@@ -38,6 +38,8 @@ namespace Positron
         {
             if (_client != null)
             {
+                Debug.Log("Udp client disconnect");
+
                 _client.Close();
                 _client.Dispose();
 

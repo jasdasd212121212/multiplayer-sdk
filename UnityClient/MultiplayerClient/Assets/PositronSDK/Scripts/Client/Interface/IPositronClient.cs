@@ -8,8 +8,10 @@ namespace Positron
         IIncapsulatedUdpClient UdpSubClient { get; }
 
         event Action connected;
+        event Action disconnected;
 
         void ConnectToMaster(ClientSettings settings);
+        void DisconnectFromMaster();
         void Send(string name, string content);
 
         void AddHandler(IClientMessageHandler handler);

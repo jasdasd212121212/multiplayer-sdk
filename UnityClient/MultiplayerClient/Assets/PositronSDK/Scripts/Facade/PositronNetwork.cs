@@ -61,6 +61,11 @@ namespace Positron
             await UniTask.WaitWhile(() => !connected);
         }
 
+        public static void Disconnect()
+        {
+            _client.DisconnectFromMaster();
+        }
+
         public static T GetHandler<T>() where T : IClientMessageHandler
         {
             return _client.GetHandler<T>();

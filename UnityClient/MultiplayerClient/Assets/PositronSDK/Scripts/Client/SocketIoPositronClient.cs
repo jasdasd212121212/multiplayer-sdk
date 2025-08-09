@@ -15,12 +15,15 @@ namespace Positron
         private SocketIOUnity _socket;
         private BrotlitInteractor _interactor;
         private ConnectionObjectKernel _connectionObjectKernel;
-        private PositronUdpClient _udpClient;
+        private IUdpClient _udpClient;
+
+        private bool _connected;
 
         public bool IsConnected => _socket != null && _socket.Connected;
         public IIncapsulatedUdpClient UdpSubClient => _udpClient;
 
         public event Action connected;
+        public event Action disconnected;
 
         public SocketIoPositronClient()
         {
@@ -53,6 +56,22 @@ namespace Positron
             {
                 ProcessConnectionWithSubCient(settings, data).Forget();
             });
+        }
+
+        public void DisconnectFromMaster()
+        {
+            if (IsConnected || _connected)
+            {
+                Debug.Log("Socket IO client disconnect");
+
+                _socket.Disconnect();
+                _socket.Dispose();
+                _udpClient.Disconnect();
+
+                _connected = false;
+
+                disconnected?.Invoke();
+            }
         }
 
         public void Send(string name, string content)
@@ -96,12 +115,7 @@ namespace Positron
 
         private void OnKernelDestroy()
         {
-            if (IsConnected)
-            {
-                _socket.Disconnect();
-                _socket.Dispose();
-                _udpClient.Disconnect();
-            }
+            DisconnectFromMaster();
         }
 
         private string ParseSocketIoResponse(SocketIOResponse data)
@@ -119,6 +133,11 @@ namespace Positron
 
         private async UniTask ProcessConnectionWithSubCient(ClientSettings settings, SocketIOResponse data)
         {
+            if (_connected)
+            {
+                return;
+            }
+
             InitialSocketIoMessageData response = JsonUtility.FromJson<InitialSocketIoMessageData>(ParseSocketIoResponse(data));
             await _udpClient.Connect(settings.UdpPort, response.UdpPort, settings.RemoteServerAddress);
 
@@ -126,6 +145,7 @@ namespace Positron
             connected?.Invoke();
 
             _connectionObjectKernel.kernelDestroyed += OnKernelDestroy;
+            _connected = true;
         }
     }
 }
