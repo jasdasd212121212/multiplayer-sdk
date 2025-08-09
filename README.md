@@ -19,6 +19,7 @@ request: CreateRoom
 {
     "name": "any name",
     "scene": -1,
+    "maxPlayers": 1,
     "data": {
         "any_key": "any values etc."
     }
@@ -130,20 +131,24 @@ EMPTY
 response: roomsList
 ```
 {
-    "list":[
+    "rooms":[
         {
             "name": "any name",
             "guid": "DATE UUID",
             "data": {
                 "any_key": "any values etc."
-            }
+            },
+            "count": -1,
+            "max": -1
         },
         {
             "name": "any name 2",
             "guid": "DATE UUID 2",
             "data": {
                 "any_key": "any values etc. 2"
-            }
+            },
+            "count": -1,
+            "max": -1
         }
     ]
 }

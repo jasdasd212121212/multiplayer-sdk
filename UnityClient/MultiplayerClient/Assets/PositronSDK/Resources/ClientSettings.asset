@@ -15,3 +15,4 @@ MonoBehaviour:
   _protocol: ws
   _remoteServerAddress: localhost
   _port: 7000
+  _udpPort: 7001

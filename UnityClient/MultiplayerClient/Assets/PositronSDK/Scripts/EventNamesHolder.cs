@@ -13,6 +13,5 @@ namespace Positron
         public static readonly string OBJECT_CREATED = "objectCreated";
         public static readonly string OBJECT_DELETED = "objectDeleted";
         public static readonly string RAISE_EVENT = "raiseEvent";
-        public static readonly string TICK = "objectsTick";
     }
 }

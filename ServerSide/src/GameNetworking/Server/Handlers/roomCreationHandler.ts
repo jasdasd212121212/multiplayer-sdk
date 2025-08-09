@@ -15,7 +15,7 @@ class roomCreationHandler extends serverEventHandlerBase{
 
         if(!isConnectedToAnyRoom){
             console.log(`Room named: ${options.name} created with id: ${guid}`);
-            this.server.createRoom(guid, options.name, options.data, 10, options.scene);
+            this.server.createRoom(guid, options.name, options.data, 10, options.scene, options.maxPlayers);
 
             sourceSocket.emit(responseEventsList.roomCreated, await JsonCompressor.instance.stringify({createdRoomId: guid}));
         }

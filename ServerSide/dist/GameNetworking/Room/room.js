@@ -5,7 +5,7 @@ import { syncronizationPackegeGenerationOptions } from "./Options/syncronization
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 class room {
-    constructor(id, roomName, additionalData, TTL, sceneIndex, server) {
+    constructor(id, roomName, additionalData, TTL, sceneIndex, server, maxPlayers) {
         this.objects = new Map();
         this.objectsArray = [];
         this.clients = [];
@@ -23,6 +23,8 @@ class room {
         this.timeToLive = TTL;
         this.lastPlayerDisconnectTime = new Date().getTime();
         this.scene = sceneIndex;
+        this.maximalPlayersCount = maxPlayers;
+        this.currentPlayersCount = 0;
         this.gameServer = server;
         this.ticker.start();
     }
@@ -72,6 +74,12 @@ class room {
     getObjectsCount() {
         return this.objects.size;
     }
+    getCurrentPlayersCount() {
+        return this.currentPlayersCount;
+    }
+    getMaxPlayersCount() {
+        return this.maximalPlayersCount;
+    }
     getObjectsPackege(sourceList, option) {
         let resultData = [];
         if (option == "" || option == null || option == undefined) {
@@ -91,6 +99,7 @@ class room {
             this.hostClientId = connection.getId();
         }
         this.clients.push(connection);
+        this.currentPlayersCount++;
         this.raiseEventDispatcher.retryBuffer();
     }
     removeConnection(client) {
@@ -98,7 +107,11 @@ class room {
         if (index > -1) {
             this.clients.splice(index, 1);
         }
+        this.currentPlayersCount--;
         this.lastPlayerDisconnectTime = new Date().getTime();
+    }
+    validByConnectionsCount() {
+        return this.currentPlayersCount >= this.maximalPlayersCount;
     }
     getConnection(index) {
         return this.clients[index];

@@ -17,7 +17,7 @@ class roomJoinHandler extends serverEventHandlerBase{
         let room: room = this.server.findRoom(roomId);
 
         if(room != null){
-            if(!this.isEarlyConnected(sourceSocket, room)){
+            if(!this.isEarlyConnected(sourceSocket, room) && room.validByConnectionsCount()){
                 let clientId: number = room.generateClientId();
                 let clientConnection: client = new client(clientId, sourceSocket);
 

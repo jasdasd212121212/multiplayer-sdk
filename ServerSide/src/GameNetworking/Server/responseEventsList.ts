@@ -12,5 +12,6 @@ export const responseEventsList = {
     roomsList: "roomsList",
     raiseEvent: "raiseEvent",
     sceneChanged: "roomSceneChanged",
-    roomLeaved: "roomLeaved"
+    roomLeaved: "roomLeaved",
+    connectionMessage: "connected"
 }

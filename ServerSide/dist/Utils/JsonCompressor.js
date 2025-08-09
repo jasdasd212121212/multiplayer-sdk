@@ -14,6 +14,9 @@ class JsonCompressor {
             JsonCompressor.instance = new JsonCompressor(compressThrashold);
         }
     }
+    getFullMark() {
+        return nonCompressMark + nonCompressMarkSeparator;
+    }
     async stringify(input) {
         let jsonString = JSON.stringify(input);
         if (jsonString.length > this.compressionThrashold) {

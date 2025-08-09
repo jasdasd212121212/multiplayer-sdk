@@ -5,6 +5,7 @@ namespace Positron
     public interface IPositronClient
     {
         bool IsConnected { get; }
+        IIncapsulatedUdpClient UdpSubClient { get; }
 
         event Action connected;
 

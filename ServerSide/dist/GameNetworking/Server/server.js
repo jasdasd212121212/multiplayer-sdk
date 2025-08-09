@@ -1,6 +1,8 @@
 import { room } from "../Room/room.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { responseEventsList } from "./responseEventsList.js";
 const host = "localhost";
 const port = 7000;
 const httpServer = createServer();
@@ -28,7 +30,7 @@ class server {
         io.on("connection", (user) => {
             let udpPort = this.gameUdpServer.bindIo(user.id);
             console.log("new connection. UDP port: " + udpPort);
-            user.emit("connected", JSON.stringify({ udp: udpPort }));
+            user.emit(responseEventsList.connectionMessage, JsonCompressor.instance.getFullMark() + JSON.stringify({ udp: udpPort }));
             for (let i = 0; i < this.handlers.length; i++) {
                 user.on(this.handlers[i].name, async (data) => {
                     await this.handlers[i].handle(data, user);
@@ -52,8 +54,8 @@ class server {
     udpSend(code, message, target) {
         this.gameUdpServer.send(target.id, code, message);
     }
-    createRoom(id, name, data, timeToLive, scene) {
-        this.rooms.push(new room(id, name, data, timeToLive, scene, this));
+    createRoom(id, name, data, timeToLive, scene, maxPlayers) {
+        this.rooms.push(new room(id, name, data, timeToLive, scene, this, maxPlayers));
     }
     findRoom(id) {
         for (let i = 0; i < this.rooms.length; i++) {
@@ -84,7 +86,9 @@ class server {
             list.push({
                 name: this.rooms[i].getName(),
                 guid: this.rooms[i].getId(),
-                data: this.rooms[i].getData()
+                data: this.rooms[i].getData(),
+                count: this.rooms[i].getCurrentPlayersCount(),
+                max: this.rooms[i].getMaxPlayersCount()
             });
         }
         return { rooms: list };

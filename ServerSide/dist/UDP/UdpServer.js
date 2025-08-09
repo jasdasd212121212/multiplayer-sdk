@@ -50,6 +50,7 @@ class UdpServer {
                 if (code == 0) {
                     this.bindPortToAddress(info.address, info.port);
                     socket.send("connected", info.port, info.address);
+                    console.log("Confirmed udp port: " + info.port + " with address: " + info.address);
                 }
                 else {
                     for (let i = 0; i < this.handlers.length; i++) {

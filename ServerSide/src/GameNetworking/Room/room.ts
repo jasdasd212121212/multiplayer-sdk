@@ -21,15 +21,19 @@ class room{
     private nextObjectId: number = 0; 
     private hostClientId: number = -1;
     private lastPlayerDisconnectTime: number;
+    
     private timeToLive: number; //seconds
     private scene: number;
+
+    private currentPlayersCount: number;
+    private maximalPlayersCount: number;
 
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
 
     private gameServer: server = null;
 
-    constructor(id: string, roomName: string, additionalData: object, TTL: number, sceneIndex: number, server: server){
+    constructor(id: string, roomName: string, additionalData: object, TTL: number, sceneIndex: number, server: server, maxPlayers: number){
         this.roomId = id;
         this.name = roomName;
         this.externalData = additionalData;
@@ -41,6 +45,8 @@ class room{
         this.lastPlayerDisconnectTime = new Date().getTime();
         
         this.scene = sceneIndex;
+        this.maximalPlayersCount = maxPlayers;
+        this.currentPlayersCount = 0;
 
         this.gameServer = server;
 
@@ -109,6 +115,14 @@ class room{
         return this.objects.size;
     }
 
+    public getCurrentPlayersCount(): number{
+        return this.currentPlayersCount;
+    }
+
+    public getMaxPlayersCount(): number{
+        return this.maximalPlayersCount;
+    }
+
     public getObjectsPackege(sourceList: Array<gameObject>, option: string): object{
         let resultData: Array<object> = [];
 
@@ -135,6 +149,7 @@ class room{
         }
 
         this.clients.push(connection);
+        this.currentPlayersCount++;
 
         this.raiseEventDispatcher.retryBuffer();
     }
@@ -145,7 +160,12 @@ class room{
             this.clients.splice(index, 1);
         }
 
+        this.currentPlayersCount--;
         this.lastPlayerDisconnectTime = new Date().getTime();
+    }
+
+    public validByConnectionsCount(): boolean{
+        return this.currentPlayersCount >= this.maximalPlayersCount;
     }
 
     public getConnection(index: number): client{

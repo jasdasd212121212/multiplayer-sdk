@@ -22,6 +22,10 @@ class JsonCompressor{
         }
     }
 
+    public getFullMark(): string{
+        return nonCompressMark + nonCompressMarkSeparator;
+    }
+
     public async stringify(input: object): Promise<string>{
         let jsonString: string = JSON.stringify(input);
 
