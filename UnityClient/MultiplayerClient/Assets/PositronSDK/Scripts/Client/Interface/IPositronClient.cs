@@ -6,6 +6,7 @@ namespace Positron
     {
         bool IsConnected { get; }
         IIncapsulatedUdpClient UdpSubClient { get; }
+        MonoBehaviourPositronCallbacksPresenter CallbacksPresenter { get; }
 
         event Action connected;
         event Action disconnected;

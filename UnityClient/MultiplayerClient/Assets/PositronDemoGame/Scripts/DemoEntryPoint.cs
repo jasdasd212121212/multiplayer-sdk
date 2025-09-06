@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Positron.Demo
@@ -6,11 +7,7 @@ namespace Positron.Demo
     {
         private void Start()
         {
-            PositronNetwork.ConnectToMasterServer(() =>
-            {
-                Debug.Log("Connected to master!!!");
-                PositronNetwork.FetchRoomsList();
-            });
+            PositronNetwork.ConnectToMasterServer().Forget();
         }
     }
 }

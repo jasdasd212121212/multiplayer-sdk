@@ -15,12 +15,14 @@ namespace Positron
         private SocketIOUnity _socket;
         private BrotlitInteractor _interactor;
         private ConnectionObjectKernel _connectionObjectKernel;
+        private MonoBehaviourPositronCallbacksPresenter _callbacksPresenter;
         private IUdpClient _udpClient;
 
         private bool _connected;
 
         public bool IsConnected => _socket != null && _socket.Connected;
         public IIncapsulatedUdpClient UdpSubClient => _udpClient;
+        public MonoBehaviourPositronCallbacksPresenter CallbacksPresenter => _callbacksPresenter;
 
         public event Action connected;
         public event Action disconnected;
@@ -28,6 +30,7 @@ namespace Positron
         public SocketIoPositronClient()
         {
             _udpClient = new PositronUdpClient();
+            _callbacksPresenter = new();
         }
 
         ~SocketIoPositronClient()
@@ -109,7 +112,7 @@ namespace Positron
         {
             _socket.On(handler.EventName, (SocketIOResponse data) =>
             {
-                handler.Process(ParseSocketIoResponse(data));
+                handler.Process(ParseSocketIoResponse(data), _callbacksPresenter);
             });
         }
 

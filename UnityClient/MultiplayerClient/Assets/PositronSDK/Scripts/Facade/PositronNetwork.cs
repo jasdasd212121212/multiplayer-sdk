@@ -39,7 +39,8 @@ namespace Positron
             _client.ConnectToMaster(_settingsLoader.Load());
             _client.connected += () => 
             { 
-                connectCallback?.Invoke(); 
+                connectCallback?.Invoke();
+                SendConnectedCallback();
             };
         }
 
@@ -59,6 +60,8 @@ namespace Positron
             };
 
             await UniTask.WaitWhile(() => !connected);
+
+            SendConnectedCallback();
         }
 
         public static void Disconnect()
@@ -79,6 +82,15 @@ namespace Positron
             }
 
             _client.Send(ReqestEventNamesHolder.GET_ROOMS_LIST, "");
+        }
+
+        private static void SendConnectedCallback()
+        {
+            _client.CallbacksPresenter.RefrashViews();
+            _client.CallbacksPresenter.ForEachView((MonoBehaviourPositronCallbacks view) =>
+            {
+                view.OnConnectedToMaster();
+            });
         }
     }
 }

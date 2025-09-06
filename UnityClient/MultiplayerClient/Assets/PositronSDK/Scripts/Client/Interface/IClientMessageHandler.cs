@@ -3,6 +3,6 @@ namespace Positron
     public interface IClientMessageHandler
     {
         string EventName { get; }
-        void Process(string data);
+        void Process(string data, MonoBehaviourPositronCallbacksPresenter presenter);
     }
 }
