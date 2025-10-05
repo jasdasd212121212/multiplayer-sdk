@@ -1,20 +1,22 @@
-using UnityEngine;
-
 namespace Positron.Demo
 {
-    public class RoomsBrowserPresenter : MonoBehaviourPositronCallbacks
+    public class RoomsBrowserPresenter : PositronCallbacks
     {
-        [SerializeField] private RoomsBrowserModel _model;
-        [SerializeField] private RoomsBrowserView _view;
-        [SerializeField] private RoomsCreationView _creationView;
+        private readonly RoomsBrowserModel _model;
+        private readonly RoomsBrowserView _view;
+        private readonly RoomsCreationView _creationView;
 
-        private void Awake()
+        public RoomsBrowserPresenter(RoomsBrowserModel model, RoomsBrowserView view, RoomsCreationView creationView) : base()
         {
+            _model = model;
+            _view = view;
+            _creationView = creationView;
+
             _view.joinClicked += OnJoinClicked;
             _creationView.roomCreateButtonClicked += OnClickCreate;
         }
 
-        private void OnDestroy()
+        protected override void OnDisposed()
         {
             _view.joinClicked -= OnJoinClicked;
             _creationView.roomCreateButtonClicked -= OnClickCreate;

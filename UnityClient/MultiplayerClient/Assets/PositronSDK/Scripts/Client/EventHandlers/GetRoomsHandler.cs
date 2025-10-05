@@ -14,7 +14,7 @@ namespace Positron
             presenter.ForEachView(ProcessView);
         }
 
-        private void ProcessView(MonoBehaviourPositronCallbacks view)
+        private void ProcessView(IPositronCallbackable view)
         {
             view.OnRoomsListReceived(_currentRooms);
         }

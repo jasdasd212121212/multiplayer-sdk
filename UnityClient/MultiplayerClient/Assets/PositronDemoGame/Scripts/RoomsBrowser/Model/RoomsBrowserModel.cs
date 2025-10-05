@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Positron.Demo
 {
-    public class RoomsBrowserModel : MonoBehaviourPositronCallbacks
+    public class RoomsBrowserModel : PositronCallbacks
     {
         public override void OnConnectedToMaster()
         {

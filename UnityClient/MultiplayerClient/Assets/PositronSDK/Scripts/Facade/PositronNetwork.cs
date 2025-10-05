@@ -95,10 +95,20 @@ namespace Positron
             _client.Send(ReqestEventNamesHolder.CREATE_ROOM, JsonUtility.ToJson(new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData)));
         }
 
+        public static void AddPositronView(IPositronCallbackable view)
+        {
+            _client.CallbacksPresenter.AddView(view);
+        }
+
+        public static void RemovePositronView(IPositronCallbackable view)
+        {
+            _client.CallbacksPresenter.RemoveView(view);
+        }
+
         private static void SendConnectedCallback()
         {
             _client.CallbacksPresenter.RefrashViews();
-            _client.CallbacksPresenter.ForEachView((MonoBehaviourPositronCallbacks view) =>
+            _client.CallbacksPresenter.ForEachView((IPositronCallbackable view) =>
             {
                 view.OnConnectedToMaster();
             });
