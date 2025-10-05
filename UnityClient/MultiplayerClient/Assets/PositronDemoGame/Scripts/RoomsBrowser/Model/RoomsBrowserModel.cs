@@ -9,12 +9,15 @@ namespace Positron.Demo
             PositronNetwork.FetchRoomsList();
         }
 
-        public override void OnRoomsListReceived(RoomsListData rooms)
+        public void CreateRoom(string name, int scene, int maxPlayersCount, object data = null)
         {
-            foreach (RoomsListDataEntry room in rooms.Rooms)
-            {
-                Debug.Log($"Room: {room.Name} \n ID: {room.Guid} \n Players: {room.CurrentPlayersCount}/{room.MaxPlayersCount}");
-            }
+            PositronNetwork.CreateRoom(name, scene, maxPlayersCount, data);
+            PositronNetwork.FetchRoomsList();
+        }
+
+        public void JoinRoom(string id)
+        {
+            Debug.Log("TODO: make joining room");
         }
     }
 }

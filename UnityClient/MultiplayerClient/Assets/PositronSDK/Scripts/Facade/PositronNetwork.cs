@@ -25,6 +25,7 @@ namespace Positron
             _client = client;
 
             _client.AddHandler(new GetRoomsHandler());
+            _client.AddHandler(new RoomCreationHandler());
 
             _initialized = true;
         }
@@ -82,6 +83,16 @@ namespace Positron
             }
 
             _client.Send(ReqestEventNamesHolder.GET_ROOMS_LIST, "");
+        }
+
+        public static void CreateRoom(string name, int sceneIndex, int maxPlayers, object externalData = null)
+        {
+            if (!_client.IsConnected)
+            {
+                return;
+            }
+
+            _client.Send(ReqestEventNamesHolder.CREATE_ROOM, JsonUtility.ToJson(new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData)));
         }
 
         private static void SendConnectedCallback()

@@ -112,8 +112,14 @@ namespace Positron
         {
             _socket.On(handler.EventName, (SocketIOResponse data) =>
             {
-                handler.Process(ParseSocketIoResponse(data), _callbacksPresenter);
+                HandleSocketEventOnMainThread(data, handler).Forget();
             });
+        }
+
+        private async UniTask HandleSocketEventOnMainThread(SocketIOResponse data, IClientMessageHandler handler)
+        {
+            await UniTask.SwitchToMainThread();
+            handler.Process(ParseSocketIoResponse(data), _callbacksPresenter);
         }
 
         private void OnKernelDestroy()
@@ -144,7 +150,9 @@ namespace Positron
             InitialSocketIoMessageData response = JsonUtility.FromJson<InitialSocketIoMessageData>(ParseSocketIoResponse(data));
             await _udpClient.Connect(settings.UdpPort, response.UdpPort, settings.RemoteServerAddress);
 
+            await UniTask.SwitchToMainThread();
             BindHandlersToSocket();
+
             connected?.Invoke();
 
             _connectionObjectKernel.kernelDestroyed += OnKernelDestroy;
