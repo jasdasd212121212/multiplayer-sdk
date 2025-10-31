@@ -151,7 +151,7 @@ class room{
         this.clients.push(connection);
         this.currentPlayersCount++;
 
-        this.raiseEventDispatcher.retryBuffer();
+        this.raiseEventDispatcher.retryBuffer(connection.getId());
     }
 
     public removeConnection(client: client): void{

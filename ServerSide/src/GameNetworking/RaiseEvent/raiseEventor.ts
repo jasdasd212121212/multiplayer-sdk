@@ -21,11 +21,11 @@ class raiseEventor{
         await this.send(event, sourceSocket, false);
     }
 
-    public async retryBuffer(): Promise<void>{
+    public async retryBuffer(newConnectionClientID: number): Promise<void>{
         let wrappers: Array<raiseEventWrapper> = this.buffer.getBuffered();
 
         for(let i: number = 0; i < wrappers.length; i++){
-            await this.send(wrappers[i].event, wrappers[i].socket, true);
+            await this.sendToTarget(wrappers[i].event, newConnectionClientID);
         }
     }
 
@@ -40,7 +40,7 @@ class raiseEventor{
             await this.sendOthers(event, sourceSocket);
         }
         else if(targetType == raiseEventsTargets.target || targetType == raiseEventsTargets.targetBuffered){
-            await this.sendToTarget(event);
+            await this.sendToTarget(event, event.targetClient);
         }
         else{
             console.error("Undefined raise event target: " + targetType);
@@ -59,8 +59,8 @@ class raiseEventor{
         this.attackhedRoom.castOthers(responseEventsList.raiseEvent, await JsonCompressor.instance.stringify(event), source);
     }   
 
-    private async sendToTarget(event: IRaiseEventPackege): Promise<void>{
-        let targetClient: number = event.targetClient;
+    private async sendToTarget(event: IRaiseEventPackege, targetClientID: number): Promise<void>{
+        let targetClient: number = targetClientID;
 
         for(let i: number = 0; i < this.attackhedRoom.getConnectionsCount(); i++){
             let currentClient: client = this.attackhedRoom.getConnection(i);

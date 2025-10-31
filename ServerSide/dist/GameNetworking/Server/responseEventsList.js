@@ -13,6 +13,8 @@ export const responseEventsList = {
     raiseEvent: "raiseEvent",
     sceneChanged: "roomSceneChanged",
     roomLeaved: "roomLeaved",
-    connectionMessage: "connected"
+    connectionMessage: "connected",
+    networkVariablesChanged: "netVarsChanged",
+    networkVariablesDeleted: "netVarsRemoval"
 };
 //# sourceMappingURL=responseEventsList.js.map

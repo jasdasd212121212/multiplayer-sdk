@@ -100,7 +100,7 @@ class room {
         }
         this.clients.push(connection);
         this.currentPlayersCount++;
-        this.raiseEventDispatcher.retryBuffer();
+        this.raiseEventDispatcher.retryBuffer(connection.getId());
     }
     removeConnection(client) {
         const index = this.clients.indexOf(client, 0);
