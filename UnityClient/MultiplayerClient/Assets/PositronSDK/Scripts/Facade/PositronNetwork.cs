@@ -92,7 +92,12 @@ namespace Positron
                 return;
             }
 
-            _client.Send(ReqestEventNamesHolder.CREATE_ROOM, JsonUtility.ToJson(new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData)));
+            _client.Send(ReqestEventNamesHolder.CREATE_ROOM, new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData));
+        }
+
+        public static void JoinRoom(string id)
+        {
+            _client.Send(ReqestEventNamesHolder.JOIN_ROOM, new RoomJoinRequest(id));
         }
 
         public static void AddPositronView(IPositronCallbackable view)

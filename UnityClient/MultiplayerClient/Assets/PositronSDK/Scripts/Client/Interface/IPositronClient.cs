@@ -14,6 +14,7 @@ namespace Positron
         void ConnectToMaster(ClientSettings settings);
         void DisconnectFromMaster();
         void Send(string name, string content);
+        void Send(string name, object content);
 
         void AddHandler(IClientMessageHandler handler);
         T GetHandler<T>() where T : IClientMessageHandler;

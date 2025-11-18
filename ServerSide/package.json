@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "run": "node dist/index.js && pause"
+    "run-dev": "node dist/index.js",
+    "run-prod": "forever start dist/index.js"
   },
   "keywords": [],
   "author": "",

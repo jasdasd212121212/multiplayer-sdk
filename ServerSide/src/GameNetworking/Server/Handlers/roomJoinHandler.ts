@@ -17,6 +17,8 @@ class roomJoinHandler extends serverEventHandlerBase{
         let room: room = this.server.findRoom(roomId);
 
         if(room != null){
+            console.log(`joined ${room.getId()}`);
+
             if(!this.isEarlyConnected(sourceSocket, room) && room.validByConnectionsCount()){
                 let clientId: number = room.generateClientId();
                 let clientConnection: client = new client(clientId, sourceSocket);
@@ -28,12 +30,15 @@ class roomJoinHandler extends serverEventHandlerBase{
                     clientId: clientId, 
                     hostId: room.getHostClientId(),
                     scene: room.getScene(),
-                    objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll) 
+                    objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll),
+                    events: room.getEventsPackage(),
+                    variables: room.getVariablesRepo().getVariables()
                 }));
 
                 room.castOthers(responseEventsList.playerConnected, "", sourceSocket);
             }
             else{
+                console.log(`join failed ${room.getId()} eraly connected: ${this.isEarlyConnected(sourceSocket, room)} connections count validity: ${room.validByConnectionsCount()}`);
                 sourceSocket.emit(responseEventsList.clientConnectionFailed);
             }
         }

@@ -17,7 +17,8 @@ namespace Positron.Demo
 
         public void JoinRoom(string id)
         {
-            Debug.Log("TODO: make joining room");
+            Debug.Log(id);
+            PositronNetwork.JoinRoom(id);
         }
     }
 }

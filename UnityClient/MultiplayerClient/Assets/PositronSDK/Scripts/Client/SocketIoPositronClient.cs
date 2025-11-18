@@ -14,7 +14,7 @@ namespace Positron
         private List<IClientMessageHandler> _eventHandlers = new();
         private SocketIOUnity _socket;
         private BrotlitInteractor _interactor;
-        private ConnectionObjectKernel _connectionObjectKernel;
+        private ConnectionObjectHook _connectionObjectHook;
         private MonoBehaviourPositronCallbacksPresenter _callbacksPresenter;
         private IUdpClient _udpClient;
 
@@ -35,16 +35,16 @@ namespace Positron
 
         ~SocketIoPositronClient()
         {
-            if (_connectionObjectKernel != null && IsConnected)
+            if (_connectionObjectHook != null && IsConnected)
             {
-                _connectionObjectKernel.kernelDestroyed -= OnKernelDestroy;
+                _connectionObjectHook.hookDetouched -= OnHookDetouched;
             }
         }
 
         public void ConnectToMaster(ClientSettings settings)
         {
             _interactor = new();
-            _connectionObjectKernel = new GameObject("PositronKernel").AddComponent<ConnectionObjectKernel>();
+            _connectionObjectHook = new GameObject("PositronHook").AddComponent<ConnectionObjectHook>();
 
             Uri uri = new(settings.BuildURL());
             SocketIOOptions options = new();
@@ -59,6 +59,10 @@ namespace Positron
             {
                 ProcessConnectionWithSubCient(settings, data).Forget();
             });
+
+            _connectionObjectHook.hookDetouched += OnHookDetouched;
+
+            Debug.Log("Connecting to master ...");
         }
 
         public void DisconnectFromMaster()
@@ -75,6 +79,15 @@ namespace Positron
 
                 disconnected?.Invoke();
             }
+
+            _socket.Off(EventNamesHolder.CONNECTED);
+
+            foreach (IClientMessageHandler eventHandler in _eventHandlers)
+            {
+                _socket.Off(eventHandler.EventName);
+            }
+
+            Debug.Log("Socket IO client evet listeners unlistened");
         }
 
         public void Send(string name, string content)
@@ -83,6 +96,11 @@ namespace Positron
             {
                 _socket.EmitAsync(name, _interactor.CompressString(content));
             }
+        }
+
+        public void Send(string name, object content)
+        {
+            Send(name, JsonUtility.ToJson(content));
         }
 
         public void AddHandler(IClientMessageHandler handler)
@@ -122,7 +140,7 @@ namespace Positron
             handler.Process(ParseSocketIoResponse(data), _callbacksPresenter);
         }
 
-        private void OnKernelDestroy()
+        private void OnHookDetouched()
         {
             DisconnectFromMaster();
         }
@@ -154,8 +172,6 @@ namespace Positron
             BindHandlersToSocket();
 
             connected?.Invoke();
-
-            _connectionObjectKernel.kernelDestroyed += OnKernelDestroy;
             _connected = true;
         }
     }

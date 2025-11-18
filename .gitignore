@@ -97,3 +97,6 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /UnityClient/MultiplayerClient/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+/ServerSide/node_modules
+/ServerSide/dist

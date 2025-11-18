@@ -9,6 +9,8 @@ import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { server } from "../Server/server.js";
+import { INetVariable } from "./Variables/Interfaces/INetVariable.js";
+import { netVariablesRepository } from "./Variables/netVariablesRepository.js";
 
 class room{
     private name: string;
@@ -30,6 +32,7 @@ class room{
 
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
+    private variablesRespository: netVariablesRepository = null;
 
     private gameServer: server = null;
 
@@ -40,6 +43,7 @@ class room{
 
         this.ticker = new roomTicker(this);
         this.raiseEventDispatcher = new raiseEventor(this);
+        this.variablesRespository = new netVariablesRepository(this);
 
         this.timeToLive = TTL;
         this.lastPlayerDisconnectTime = new Date().getTime();
@@ -138,6 +142,14 @@ class room{
         return {o: resultData};
     }
 
+    public getEventsPackage(): Array<IRaiseEventPackege> {
+        return this.raiseEventDispatcher.extractBuffer();
+    }
+
+    public getVariablesRepo(): netVariablesRepository{
+        return this.variablesRespository;
+    }
+
     public getObjectsArray(): Array<gameObject>{
         return this.objectsArray;
     }
@@ -150,8 +162,6 @@ class room{
 
         this.clients.push(connection);
         this.currentPlayersCount++;
-
-        this.raiseEventDispatcher.retryBuffer(connection.getId());
     }
 
     public removeConnection(client: client): void{
@@ -165,7 +175,7 @@ class room{
     }
 
     public validByConnectionsCount(): boolean{
-        return this.currentPlayersCount >= this.maximalPlayersCount;
+        return this.currentPlayersCount <= this.maximalPlayersCount;
     }
 
     public getConnection(index: number): client{

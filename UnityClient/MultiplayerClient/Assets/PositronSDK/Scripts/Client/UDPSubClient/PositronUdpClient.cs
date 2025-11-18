@@ -92,7 +92,7 @@ namespace Positron
                 try
                 {
                     UdpReceiveResult result = await _client.ReceiveAsync();
-                    SplitBuffer(result.Buffer, 0, out byte[] code, out byte[] message);
+                    SplitBuffer(result.Buffer, 1, out byte[] code, out byte[] message);
 
                     string receivedString = _brotlit.DecompressString(Encoding.UTF8.GetString(message).Trim());
 

@@ -1,6 +1,6 @@
 @echo off
 
 cd ..
-npm run run
+npm run run-dev
 
 pause

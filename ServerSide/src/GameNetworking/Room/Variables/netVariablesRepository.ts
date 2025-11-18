@@ -13,6 +13,10 @@ class netVariablesRepository{
         this._room = room;
     }
 
+    public getVariables(): Array<INetVariable>{
+        return this._variables;
+    }
+
     public async addOrModifyFrom(packege: INetVariablesArray, sourceSources: Socket): Promise<void> {
         let netVarIndex: number = null;
         let addenBuffer: Array<INetVariable> = new Array<INetVariable>();

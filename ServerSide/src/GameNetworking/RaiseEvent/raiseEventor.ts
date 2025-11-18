@@ -21,12 +21,15 @@ class raiseEventor{
         await this.send(event, sourceSocket, false);
     }
 
-    public async retryBuffer(newConnectionClientID: number): Promise<void>{
-        let wrappers: Array<raiseEventWrapper> = this.buffer.getBuffered();
-
-        for(let i: number = 0; i < wrappers.length; i++){
-            await this.sendToTarget(wrappers[i].event, newConnectionClientID);
+    public extractBuffer(): Array<IRaiseEventPackege>{
+        let convenrted: Array<IRaiseEventPackege> = new Array<IRaiseEventPackege>;
+        let buffered: Array<raiseEventWrapper> = this.buffer.getBuffered();
+        
+        for(let i: number = 0; i < this.buffer.getSize(); i++){
+            convenrted.push(buffered[i].event);
         }
+
+        return convenrted;
     }
 
     private async send(event: IRaiseEventPackege, sourceSocket: Socket, isFromBuffer: boolean): Promise<void>{
