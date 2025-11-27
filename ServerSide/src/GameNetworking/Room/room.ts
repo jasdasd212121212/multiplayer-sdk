@@ -83,6 +83,10 @@ class room{
         return this.scene;
     }
 
+    public getTickrate(): number{
+        return this.ticker.getTickrate();
+    }
+
     public async sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): Promise<void>{
         await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
     }

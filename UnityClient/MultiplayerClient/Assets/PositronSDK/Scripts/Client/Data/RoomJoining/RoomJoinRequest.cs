@@ -1,13 +1,16 @@
 using UnityEngine;
 using System;
 
-[Serializable]
-public class RoomJoinRequest
+namespace Positron
 {
-    [SerializeField] private string id;
-
-    public RoomJoinRequest(string id)
+    [Serializable]
+    public class RoomJoinRequest
     {
-        this.id = id;   
+        [SerializeField] private string id;
+
+        public RoomJoinRequest(string id)
+        {
+            this.id = id;
+        }
     }
 }

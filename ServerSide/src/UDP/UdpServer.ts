@@ -83,6 +83,10 @@ class UdpServer{
         });
     }
 
+    public getPoolLength(): number{
+        return this.portsPool.length;
+    }
+
     private bindPortToAddress(ip: string, port: number): void{
         let clients: Array<udpClientInfo> = Array.from(this.bindedIoConnections.values());
 

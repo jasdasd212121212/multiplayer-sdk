@@ -1,5 +1,7 @@
 import { promisify } from 'util';
 import { brotliCompress, brotliDecompress } from 'zlib';
+import { ICompressionConfig } from '../CfgSchemas/ICompressionConfig.js';
+import { CfgLoader } from '../CfgLoader/CfgLoader.js';
 
 const nonCompressMark = "NCNC";
 const nonCompressMarkSeparator = ";;;";
@@ -14,11 +16,15 @@ class JsonCompressor{
         this.compressPromise = promisify(brotliCompress);
         this.decompressPromise = promisify(brotliDecompress);
         this.compressionThrashold = thrashold;
+
+        console.log(`JSON compress wrapper thrashold: ${thrashold}`);
     }
 
-    public static init(compressThrashold: number): void{
+    public static init(): void{
         if(JsonCompressor.instance == null){
-            JsonCompressor.instance = new JsonCompressor(compressThrashold);
+            let config: ICompressionConfig = CfgLoader.instance.load<ICompressionConfig>("compression");
+
+            JsonCompressor.instance = new JsonCompressor(config.compressionThrashold);
         }
     }
 

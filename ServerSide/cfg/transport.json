@@ -1,0 +1,16 @@
+{
+    "host": "0.0.0.0",
+    "port": 7000,
+
+    "securityDefinition": {
+        "useSSL": false,
+        "useAuth": false
+    },
+
+    "security": {
+        "CORS": "*",
+        "SSL_Cert": "",
+        "SSL_Key": "",
+        "AuthKey": ""
+    }
+}

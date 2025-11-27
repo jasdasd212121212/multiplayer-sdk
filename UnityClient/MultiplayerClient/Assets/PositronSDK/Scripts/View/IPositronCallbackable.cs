@@ -5,5 +5,6 @@ namespace Positron
         void OnRoomsListReceived(RoomsListData rooms);
         void OnConnectedToMaster();
         void OnRoomCreated(RoomCreationResponse createdRoomResponse);
+        void OnRoomJoined(RoomJoinResponse room);
     }
 }

@@ -32,7 +32,8 @@ class roomJoinHandler extends serverEventHandlerBase{
                     scene: room.getScene(),
                     objects: room.getObjectsPackege(room.getObjectsArray(), syncronizationPackegeGenerationOptions.syncAll),
                     events: room.getEventsPackage(),
-                    variables: room.getVariablesRepo().getVariables()
+                    variables: room.getVariablesRepo().getVariables(),
+                    tickrate: room.getTickrate()
                 }));
 
                 room.castOthers(responseEventsList.playerConnected, "", sourceSocket);

@@ -1,45 +1,70 @@
 import { room } from "../Room/room.js"
 import { Server, Socket } from "socket.io";
 import { createServer } from "http";
+import { createServer as createSecureServer } from "https";
 import { serverEventHandlerBase } from "./Handlers/Base/serverEventHandlerBase.js";
 import { UdpServer } from "../../UDP/UdpServer.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { responseEventsList } from "./responseEventsList.js";
-
-const host: string = "localhost";
-const port: number = 7000;
-
-const httpServer = createServer();
-const io = new Server(httpServer, {
-    cors: {
-        origin: "*"
-    },
-    transports: ['websocket']
-});
+import { ITransportConfig } from "../../CfgSchemas/ITransportConfig.js";
+import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
+import { authKeyMiddleware } from "./Middlewares/authKeyMiddleware.js";
+import { socketMiddlewareBase } from "./Middlewares/Base/socketMiddlewareBase.js";
 
 class server{
     private rooms: Array<room> = new Array<room>();
     private handlers: Array<serverEventHandlerBase>;
     private cachedConnections: Map<string, room> = new Map(); 
+    private io: Server = null;
+    private config: ITransportConfig = null;
+    private httpServer: any;
 
     private gameUdpServer: UdpServer = null;
 
     constructor(UdpServer: UdpServer){
         this.gameUdpServer = UdpServer;
+        this.config = CfgLoader.instance.load<ITransportConfig>("transport");
+
+        if(this.config.securityDefinition.useSSL){
+            this.httpServer = createSecureServer({
+                key: this.config.security.SSL_Key,
+                cert: this.config.security.SSL_Cert
+            });
+        }
+        else{
+            this.httpServer = createServer();
+        }
+
+        this.io = new Server(this.httpServer, {
+            cors: {
+                origin: this.config.security.CORS
+            },
+            transports: ["websocket"]
+        });
     }
 
-    public initHandlers(Handlers: Array<serverEventHandlerBase>){
+    public initHandlers(Handlers: Array<serverEventHandlerBase>): void{
         this.handlers = Handlers;
     }
 
+    public initMiddlewares(middlewares: Array<socketMiddlewareBase>){
+        for(let i: number = 0; i < middlewares.length; i++){
+            this.io.use((sock: Socket, nextFunc: Function) => {
+                middlewares[i].onUse(sock, nextFunc, this);
+            });
+        }
+    }
+
     public start(): void{
-        httpServer.listen(port, host, () => {
-            console.log("Server started. Host: " + host + " Port: " + port); 
+        let config: ITransportConfig = CfgLoader.instance.load<ITransportConfig>("transport");
+
+        this.httpServer.listen(config.port, config.host, () => {
+            console.log("Server started. Host: " + config.host + " Port: " + config.port); 
         });
 
-        this.gameUdpServer.startServer(host, port + 1);
+        this.gameUdpServer.startServer(config.host, config.port + 1);
 
-        io.on("connection", (user: Socket) => {
+        this.io.on("connection", (user: Socket) => {
             let udpPort: number = this.gameUdpServer.bindIo(user.id);
             
             console.log("new connection. UDP port: " + udpPort);
@@ -121,6 +146,10 @@ class server{
         }
 
         return { rooms: list };
+    }
+
+    public getCurrentPortsPoolLength(): number{
+        return this.gameUdpServer.getPoolLength();
     }
 
     private filterEmptyRooms(rooms: Array<room>): void{

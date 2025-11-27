@@ -82,7 +82,28 @@ response: joined
                 }
             }
         ]
-    }
+    },
+    "events": [
+        {
+            "type": -1,
+            "targets": -1,
+            "sourceObjectId": -1,
+            "additionalIndex": -1,
+            "targetClient": -1,
+            "payload": {
+                "message": "hello"
+            }
+        }
+    ],
+    "variables":[
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        }
+    ],
+    "tickrate": 20
 }
 ```
 OR Socket io event: 'joinFail' with empty body
@@ -172,7 +193,80 @@ response: roomSceneChanged
 }
 ```
 
+## Modify or add network variables
 
+request: ModifyVars
+```
+{
+    "variables":[
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        },
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        }
+    ]
+}
+```
+
+response: netVarsChanged
+```
+{
+    "modified": [
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        },
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        }
+    ],
+    "adden": [
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        },
+        {
+            "id": "objectid#subid#selfid",
+            "data": {
+                "value": "any value"
+            }
+        }
+    ]
+}
+```
+
+## Remove network variables
+request: RemoveVarsFromObject
+```
+{
+    "objectId": -1
+}
+```
+
+response: netVarsRemoval
+```
+{
+    "deletedVaraiblesIDs": [
+        "id1",
+        "id2",
+        "id3"
+    ]
+}
+```
 
 ## Create object
 request: CreateObject

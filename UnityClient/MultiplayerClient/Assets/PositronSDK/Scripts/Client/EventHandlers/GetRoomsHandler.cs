@@ -8,7 +8,7 @@ namespace Positron
 
         public string EventName => EventNamesHolder.ROOMS_LIST;
 
-        public void Process(string data, MonoBehaviourPositronCallbacksPresenter presenter)
+        public void Process(string data, PositronCallbacksPresenter presenter)
         {
             _currentRooms = JsonUtility.FromJson<RoomsListData>(data);
             presenter.ForEachView(ProcessView);

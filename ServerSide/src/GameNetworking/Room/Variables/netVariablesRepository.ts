@@ -6,7 +6,7 @@ import { responseEventsList } from "../../Server/responseEventsList.js";
 import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class netVariablesRepository{
-    private _variables: Array<INetVariable>;
+    private _variables: Array<INetVariable> = [];
     private _room: room;
 
     constructor(room: room){
@@ -39,7 +39,7 @@ class netVariablesRepository{
             modified: modifiedBuffer,
             adden: addenBuffer
         }), sourceSources);
-    } // TODO: USE IT!!!
+    }
 
     public async removeVariablesFromObject(objectId: number): Promise<void> {
         let variabesIndexes: Array<number> = this.tryFindVariablesByObjectID(1);
@@ -54,7 +54,7 @@ class netVariablesRepository{
         this._room.broadcast(responseEventsList.networkVariablesDeleted, await JsonCompressor.instance.stringify({
             deletedVaraiblesIDs: deletedBuffer
         }));
-    } // TODO: USE IT!!!
+    }
 
     private tryFindContainedVariable(id: string): number {
         for(let i: number = 0; i < this._variables.length; i++){

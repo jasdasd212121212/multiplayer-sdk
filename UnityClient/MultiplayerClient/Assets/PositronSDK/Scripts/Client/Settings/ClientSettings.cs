@@ -10,10 +10,15 @@ namespace Positron
         [SerializeField][Min(1)] private int _port = 7000;
         [SerializeField][Min(2)] private int _udpPort = 7001;
 
+        [Header("Optional")]
+
+        [SerializeField] private string _authKey = "";
+
         public string Protocol => _protocol;
         public string RemoteServerAddress => _remoteServerAddress;
         public int Port => _port;
         public int UdpPort => _udpPort;
+        public string AuthKey => _authKey;
 
         public string BuildURL()
         {

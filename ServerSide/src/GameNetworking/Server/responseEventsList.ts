@@ -14,6 +14,6 @@ export const responseEventsList = {
     sceneChanged: "roomSceneChanged",
     roomLeaved: "roomLeaved",
     connectionMessage: "connected",
-    networkVariablesChanged: "netVarsChanged", // IMPLEMENT
-    networkVariablesDeleted: "netVarsRemoval"  // IMPLEMENT
+    networkVariablesChanged: "netVarsChanged",
+    networkVariablesDeleted: "netVarsRemoval"
 }

@@ -1,9 +1,13 @@
+import path from "path";
+import { CfgLoader } from "./CfgLoader/CfgLoader.js";
+import { addOrModifyVariablesHandler } from "./GameNetworking/Server/Handlers/addOrModifyVariablesHandler.js";
 import { serverEventHandlerBase } from "./GameNetworking/Server/Handlers/Base/serverEventHandlerBase.js";
 import { changeRoomSceneHandler } from "./GameNetworking/Server/Handlers/changeRoomSceneHandler.js";
 import { createObjectHandler } from "./GameNetworking/Server/Handlers/createObjectHandler.js";
 import { getRoomsListHandler } from "./GameNetworking/Server/Handlers/getRoomsListHandler.js";
 import { raiseEventHandler } from "./GameNetworking/Server/Handlers/raiseEventHandler.js";
 import { removeObjectHandler } from "./GameNetworking/Server/Handlers/removeObjectHandler.js";
+import { removeVariablesFromObjectHandler } from "./GameNetworking/Server/Handlers/removeVariablesFromObjectHandler.js";
 import { roomCreationHandler } from "./GameNetworking/Server/Handlers/roomCreationHandler.js";
 import { roomDisconnectHandler } from "./GameNetworking/Server/Handlers/roomDisconnectHandler.js";
 import { roomJoinHandler } from "./GameNetworking/Server/Handlers/roomJoinHandler.js";
@@ -12,13 +16,18 @@ import { udpHandlerBase } from "./UDP/Handlers/Base/udpHandlerBase.js";
 import { objectsUpdateHandler } from "./UDP/Handlers/objectsUpdateHandler.js";
 import { UdpServer } from "./UDP/UdpServer.js";
 import { JsonCompressor } from "./Utils/JsonCompressor.js";
+import { socketMiddlewareBase } from "./GameNetworking/Server/Middlewares/Base/socketMiddlewareBase.js";
+import { authKeyMiddleware } from "./GameNetworking/Server/Middlewares/authKeyMiddleware.js";
+import { udpPoolLimitationMiddleware } from "./GameNetworking/Server/Middlewares/udpPoolLimitationMiddleware.js";
 
-JsonCompressor.init(256);
+CfgLoader.init(path.resolve("."));
+JsonCompressor.init();
 
 let udpServer: UdpServer = new UdpServer();
 let gameServer: server = new server(udpServer);
 
 let handlers: Array<serverEventHandlerBase> = [];
+let middlewares: Array<socketMiddlewareBase> = [];
 let udpHandlers: Array<udpHandlerBase> = [];
 
 handlers.push(new roomCreationHandler(gameServer));
@@ -29,10 +38,16 @@ handlers.push(new removeObjectHandler(gameServer));
 handlers.push(new getRoomsListHandler(gameServer));
 handlers.push(new raiseEventHandler(gameServer));
 handlers.push(new changeRoomSceneHandler(gameServer));
+handlers.push(new addOrModifyVariablesHandler(gameServer));
+handlers.push(new removeVariablesFromObjectHandler(gameServer));
+
+middlewares.push(new authKeyMiddleware());
+middlewares.push(new udpPoolLimitationMiddleware());
 
 udpHandlers.push(new objectsUpdateHandler(udpServer, gameServer));
 
 udpServer.initHandlers(udpHandlers);
 gameServer.initHandlers(handlers);
+gameServer.initMiddlewares(middlewares);
 
 gameServer.start(); 

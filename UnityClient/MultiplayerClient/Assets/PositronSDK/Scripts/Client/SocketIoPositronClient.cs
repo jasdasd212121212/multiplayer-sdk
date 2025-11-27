@@ -15,14 +15,16 @@ namespace Positron
         private SocketIOUnity _socket;
         private BrotlitInteractor _interactor;
         private ConnectionObjectHook _connectionObjectHook;
-        private MonoBehaviourPositronCallbacksPresenter _callbacksPresenter;
+        private PositronCallbacksPresenter _callbacksPresenter;
         private IUdpClient _udpClient;
 
         private bool _connected;
 
         public bool IsConnected => _socket != null && _socket.Connected;
         public IIncapsulatedUdpClient UdpSubClient => _udpClient;
-        public MonoBehaviourPositronCallbacksPresenter CallbacksPresenter => _callbacksPresenter;
+        public PositronCallbacksPresenter CallbacksPresenter => _callbacksPresenter;
+
+        private const string AUTH_KEY_HEADER = "authkey";
 
         public event Action connected;
         public event Action disconnected;
@@ -51,6 +53,10 @@ namespace Positron
             options.Transport = TransportProtocol.WebSocket;
             options.AutoUpgrade = false;
             options.EIO = EngineIO.V4;
+            options.ExtraHeaders = new Dictionary<string, string>()
+            {
+                { AUTH_KEY_HEADER, settings.AuthKey }
+            };
 
             _socket = new SocketIOUnity(uri, options);
             _socket.ConnectAsync();
@@ -60,9 +66,16 @@ namespace Positron
                 ProcessConnectionWithSubCient(settings, data).Forget();
             });
 
+            _socket.OnError += OnConnectionError;
             _connectionObjectHook.hookDetouched += OnHookDetouched;
 
             Debug.Log("Connecting to master ...");
+        }
+
+        private void OnConnectionError(object sender, string error)
+        {
+            DisconnectFromMaster();
+            Debug.LogError($"Positron critical error -> connection fault: {error}");
         }
 
         public void DisconnectFromMaster()

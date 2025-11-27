@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Positron.Demo
 {
     public class RoomsBrowserModel : PositronCallbacks
@@ -17,7 +15,6 @@ namespace Positron.Demo
 
         public void JoinRoom(string id)
         {
-            Debug.Log(id);
             PositronNetwork.JoinRoom(id);
         }
     }

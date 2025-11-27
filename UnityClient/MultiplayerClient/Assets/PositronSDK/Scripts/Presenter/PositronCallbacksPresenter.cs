@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Positron
 {
-    public class MonoBehaviourPositronCallbacksPresenter
+    public class PositronCallbacksPresenter
     {
         private List<IPositronCallbackable> _views = new();
 

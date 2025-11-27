@@ -26,6 +26,7 @@ namespace Positron
 
             _client.AddHandler(new GetRoomsHandler());
             _client.AddHandler(new RoomCreationHandler());
+            _client.AddHandler(new RoomJoinHandler());
 
             _initialized = true;
         }

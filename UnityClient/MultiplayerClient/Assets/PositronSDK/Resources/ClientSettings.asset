@@ -16,3 +16,4 @@ MonoBehaviour:
   _remoteServerAddress: localhost
   _port: 7000
   _udpPort: 7001
+  _authKey: 

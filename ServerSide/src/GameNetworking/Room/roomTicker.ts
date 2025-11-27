@@ -1,3 +1,5 @@
+import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
+import { IGameConfig } from "../../CfgSchemas/IGameConfig.js";
 import { udpEventsList } from "../../UDP/udpEventsList.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { responseEventsList } from "../Server/responseEventsList.js";
@@ -5,22 +7,28 @@ import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { room } from "./room.js";
 
-const TICKRATE = 20;
-
 class roomTicker{
     private attackhedRoom: room;
     private netframeBuffer: netframe;
+    private tickrate: number;
  
     constructor(room: room){
         this.attackhedRoom = room;
         this.netframeBuffer = new netframe();
+        this.tickrate = CfgLoader.instance.load<IGameConfig>("game").tickrate;
+
+        console.log(`room ticker tickrate: ${this.tickrate}`);
     }
 
     public start(): void{
         setInterval(async () => 
             { 
                 await this.onTick(); 
-            }, 1000 / TICKRATE)
+            }, 1000 / this.tickrate)
+    }
+
+    public getTickrate(): number{
+        return this.tickrate;
     }
 
     public async onTick(): Promise<void>{
