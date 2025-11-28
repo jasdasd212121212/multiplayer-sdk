@@ -8,7 +8,7 @@ namespace Positron
     {
         [SerializeField] private int clientId;
         [SerializeField] private int hostId;
-        [SerializeField] private int sceneIndex;
+        [SerializeField] private int scene;
         [SerializeField] private RoomJoinObjectsWrapPackege objects;
         [SerializeField] private RaiseEventData[] events;
         [SerializeField] private NetVariableData[] variables;
@@ -16,7 +16,7 @@ namespace Positron
 
         public int SelfId => clientId;
         public int HostId => hostId;
-        public int SceneIndex => sceneIndex;
+        public int SceneIndex => scene;
         public RoomObjectData[] Objects => objects.SceneObjectsFullSynced;
         public RaiseEventData[] Events => events;
         public NetVariableData[] Variables => variables;

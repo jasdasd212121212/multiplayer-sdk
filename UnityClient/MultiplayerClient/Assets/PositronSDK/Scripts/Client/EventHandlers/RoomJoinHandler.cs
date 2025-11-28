@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Positron
 {
@@ -11,6 +12,8 @@ namespace Positron
             RoomJoinResponse response = JsonUtility.FromJson<RoomJoinResponse>(data);
 
             // make here stuff of init scene, variables and events etc.
+            SceneManager.LoadScene(response.SceneIndex);
+            Debug.Log(response.SceneIndex);
 
             presenter.ForEachView(view => 
             {
