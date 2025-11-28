@@ -15,7 +15,7 @@ export class CfgLoader {
     }
 
     constructor(basePath: string){
-        this.basePath = basePath + `\\${CFG_FOLDER}`;
+        this.basePath = basePath + `/${CFG_FOLDER}`;
         console.log(`cfg loader initialized at base: ${this.basePath}`);
     }
 
@@ -29,7 +29,7 @@ export class CfgLoader {
 
     private loadFileContent(name: string): string{
         try{
-            return readFileSync(this.basePath + `\\${name}.json`, "utf-8");
+            return readFileSync(this.basePath + `/${name}.json`, "utf-8");
         }
         catch(e){
             console.error(e);
