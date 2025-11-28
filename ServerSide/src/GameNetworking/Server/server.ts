@@ -8,8 +8,8 @@ import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { responseEventsList } from "./responseEventsList.js";
 import { ITransportConfig } from "../../CfgSchemas/ITransportConfig.js";
 import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
-import { authKeyMiddleware } from "./Middlewares/authKeyMiddleware.js";
 import { socketMiddlewareBase } from "./Middlewares/Base/socketMiddlewareBase.js";
+import { readFileSync } from "node:fs";
 
 class server{
     private rooms: Array<room> = new Array<room>();
@@ -26,9 +26,12 @@ class server{
         this.config = CfgLoader.instance.load<ITransportConfig>("transport");
 
         if(this.config.securityDefinition.useSSL){
+            let pemKeyContent: string = readFileSync(this.config.security.SSL_Key, "utf-8").trim();
+            let pemCertContent: string = readFileSync(this.config.security.SSL_Cert, "utf-8").trim();
+
             this.httpServer = createSecureServer({
-                key: this.config.security.SSL_Key,
-                cert: this.config.security.SSL_Cert
+                key: pemKeyContent,
+                cert: pemCertContent
             });
         }
         else{
