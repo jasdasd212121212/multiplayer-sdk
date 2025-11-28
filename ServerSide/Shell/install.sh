@@ -1,3 +1,7 @@
+cd ~
+cd .. && cd ..
+cd home
+
 sudo apt update 
 sudo apt install curl
 sudo apt-get install git
