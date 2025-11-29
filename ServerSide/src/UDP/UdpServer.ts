@@ -1,23 +1,15 @@
 import dgram, { RemoteInfo, Socket } from "node:dgram";
 import { udpClientInfo } from "./udpClientInfo.js";
 import { udpHandlerBase } from "./Handlers/Base/udpHandlerBase.js";
+import { v4 as uuidV4 } from "uuid";
 
 const socket: Socket = dgram.createSocket("udp4");
-const minPort: number = 40000;
-const maxPort: number = 60000; 
 
 class UdpServer{
     private bindedIoConnections: Map<string, udpClientInfo> = new Map();
-    private portsToSocketIoBindings: Map<number, string> = new Map();
+    private portsToSocketIoBindings: Map<string, string> = new Map();
 
-    private portsPool: Array<number> = [];
     private handlers: Array<udpHandlerBase> = null;
-
-    constructor(){
-        for(let i: number = minPort; i < maxPort; i++){
-            this.portsPool.push(i);
-        }
-    }
 
     public initHandlers(initalHandlers: Array<udpHandlerBase>): void{
         if(this.handlers == null){
@@ -25,26 +17,25 @@ class UdpServer{
         }
     }
 
-    public bindIo(socketIoId: string): number{
-        let port: number = this.portsPool.pop();
-        this.bindedIoConnections.set(socketIoId, new udpClientInfo(port));
-        this.portsToSocketIoBindings.set(port, socketIoId);
+    public bindIo(socketIoId: string): string{
+        let uuid: string = uuidV4();
+        this.bindedIoConnections.set(socketIoId, new udpClientInfo(uuid));
+        this.portsToSocketIoBindings.set(uuid, socketIoId);
 
-        return port;
+        return uuid;
     }
 
     public disposeIoPort(socketIoId: string): void{
         let clientInfo: udpClientInfo = this.bindedIoConnections.get(socketIoId);
-        this.portsPool.push(clientInfo.getPort());
-        
+    
         this.bindedIoConnections.delete(socketIoId);
-        this.portsToSocketIoBindings.delete(clientInfo.getPort());
+        this.portsToSocketIoBindings.delete(clientInfo.getId());
 
-        console.log("Disposed udp port: " + clientInfo.getPort());
+        console.log("Disposed udp connection: " + clientInfo.getId());
     }
 
-    public getBindedIoByPort(port: number): string{
-        return this.portsToSocketIoBindings.get(port);
+    public getBindedIoById(id: string): string{
+        return this.portsToSocketIoBindings.get(id);
     }
 
     public send(socketIoId: string, code: number, message: string): void{
@@ -54,7 +45,7 @@ class UdpServer{
             let messageBuffer: Buffer = Buffer.from(" " + message);
             messageBuffer[0] = code;
 
-            socket.send(messageBuffer, clientInfo.getPort(), clientInfo.getIp());
+            socket.send(messageBuffer, clientInfo.getClientPort(), clientInfo.getIp());
         }
     }
 
@@ -62,19 +53,27 @@ class UdpServer{
         socket.bind(port, host, () => {
             socket.on("message", async (msg: Buffer, info: RemoteInfo) => {
                 let code: number = msg[0];
-                let message: string = msg.slice(1).toString();
+                let uuidString: string = msg.slice(1, 37).toString("utf-8");
+                let message: string = msg.slice(37).toString("utf-8");
 
                 if(code == 0){
-                    this.bindPortToAddress(info.address, info.port);
+                    this.bindPortAndIdToAddress(info.address, uuidString, info.port);
                     socket.send("connected", info.port, info.address);
 
                     console.log("Confirmed udp port: " + info.port + " with address: " + info.address);
                 }
                 else{
-                    for(let i: number = 0; i < this.handlers.length; i++){
-                        if(this.handlers[i].event == code){
-                            await this.handlers[i].handle(message, info.address, info.port);
+                    let client: udpClientInfo = this.bindedIoConnections.get(this.portsToSocketIoBindings.get(uuidString));
+                    
+                    if(client !== undefined && client.getIp() == info.address){
+                        for(let i: number = 0; i < this.handlers.length; i++){
+                            if(this.handlers[i].event == code){
+                               await this.handlers[i].handle(message, info.address, uuidString);
+                            }
                         }
+                    }
+                    else{
+                        console.error(`Invalid transmission from ${info.address}:${info.port}`);
                     }
                 }
             });
@@ -83,16 +82,13 @@ class UdpServer{
         });
     }
 
-    public getPoolLength(): number{
-        return this.portsPool.length;
-    }
-
-    private bindPortToAddress(ip: string, port: number): void{
+    private bindPortAndIdToAddress(ip: string, uuid: string, port: number): void{
         let clients: Array<udpClientInfo> = Array.from(this.bindedIoConnections.values());
 
         for(let i: number = 0; i < clients.length; i++){
-            if(clients[i].getPort() == port){
+            if(clients[i].getId() == uuid){
                 clients[i].initIp(ip);
+                clients[i].initPort(port);
                 break;
             }
         }

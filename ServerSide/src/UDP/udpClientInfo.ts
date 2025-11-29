@@ -1,9 +1,10 @@
 class udpClientInfo{
     private address: string = "";
-    private port: number;
+    private uuid: string = "";
+    private clientPort: number = -1;
 
-    constructor(Port: number){
-        this.port = Port;
+    constructor(uuid: string){
+        this.uuid = uuid;
     }
 
     public getIp(): string{
@@ -16,12 +17,22 @@ class udpClientInfo{
         }
     }
 
-    public isAvaliableForTransmisson(): boolean{
-        return this.address != "";
+    public initPort(port: number): void{
+        if (this.clientPort === -1){
+            this.clientPort = port;
+        }
     }
 
-    public getPort(): number{
-        return this.port;
+    public isAvaliableForTransmisson(): boolean{
+        return this.address != "" && this.uuid != "" && this.clientPort != -1;
+    }
+
+    public getId(): string{
+        return this.uuid;
+    }
+
+    public getClientPort(): number{
+        return this.clientPort;
     }
 }
 

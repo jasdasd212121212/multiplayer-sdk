@@ -9,9 +9,9 @@ import { gameObject } from "../../GameNetworking/Room/gameObject.js";
 class objectsUpdateHandler extends udpHandlerBase{
     public event: number = udpEventsList.updateObjects;
 
-    public async handle(message: string, ip: string, port: number): Promise<void> {
+    public async handle(message: string, ip: string, id: string): Promise<void> {
         let parsed: IObjectUpgradePackege = <IObjectUpgradePackege> await JsonCompressor.instance.parse(message);
-        let currentRoom: room = this.gameServer.getCachedConnectionById(this.udpServer.getBindedIoByPort(port));
+        let currentRoom: room = this.gameServer.getCachedConnectionById(this.udpServer.getBindedIoById(id));
 
         if(currentRoom != null){
             let clientId: number = parsed.clientId;

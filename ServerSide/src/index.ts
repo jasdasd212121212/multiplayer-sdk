@@ -18,7 +18,6 @@ import { UdpServer } from "./UDP/UdpServer.js";
 import { JsonCompressor } from "./Utils/JsonCompressor.js";
 import { socketMiddlewareBase } from "./GameNetworking/Server/Middlewares/Base/socketMiddlewareBase.js";
 import { authKeyMiddleware } from "./GameNetworking/Server/Middlewares/authKeyMiddleware.js";
-import { udpPoolLimitationMiddleware } from "./GameNetworking/Server/Middlewares/udpPoolLimitationMiddleware.js";
 
 CfgLoader.init(path.resolve("."));
 JsonCompressor.init();
@@ -42,7 +41,6 @@ handlers.push(new addOrModifyVariablesHandler(gameServer));
 handlers.push(new removeVariablesFromObjectHandler(gameServer));
 
 middlewares.push(new authKeyMiddleware());
-middlewares.push(new udpPoolLimitationMiddleware());
 
 udpHandlers.push(new objectsUpdateHandler(udpServer, gameServer));
 

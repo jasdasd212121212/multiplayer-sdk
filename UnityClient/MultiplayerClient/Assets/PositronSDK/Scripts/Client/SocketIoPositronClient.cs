@@ -179,7 +179,7 @@ namespace Positron
             }
 
             InitialSocketIoMessageData response = JsonUtility.FromJson<InitialSocketIoMessageData>(ParseSocketIoResponse(data));
-            await _udpClient.Connect(settings.UdpPort, response.UdpPort, settings.RemoteServerAddress);
+            await _udpClient.Connect(settings.UdpPort, response.UdpUUID, settings.RemoteServerAddress);
 
             await UniTask.SwitchToMainThread();
             BindHandlersToSocket();

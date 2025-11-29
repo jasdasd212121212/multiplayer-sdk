@@ -68,10 +68,10 @@ class server{
         this.gameUdpServer.startServer(config.host, config.port + 1);
 
         this.io.on("connection", (user: Socket) => {
-            let udpPort: number = this.gameUdpServer.bindIo(user.id);
+            let udpUuid: string = this.gameUdpServer.bindIo(user.id);
             
-            console.log("new connection. UDP port: " + udpPort);
-            user.emit(responseEventsList.connectionMessage, JsonCompressor.instance.getFullMark() + JSON.stringify({udp: udpPort}));
+            console.log("new connection. UDP UUID: " + udpUuid);
+            user.emit(responseEventsList.connectionMessage, JsonCompressor.instance.getFullMark() + JSON.stringify({udp: udpUuid}));
 
             for(let i: number = 0; i < this.handlers.length; i++){
                 user.on(this.handlers[i].name, async (data) => {
@@ -149,10 +149,6 @@ class server{
         }
 
         return { rooms: list };
-    }
-
-    public getCurrentPortsPoolLength(): number{
-        return this.gameUdpServer.getPoolLength();
     }
 
     private filterEmptyRooms(rooms: Array<room>): void{

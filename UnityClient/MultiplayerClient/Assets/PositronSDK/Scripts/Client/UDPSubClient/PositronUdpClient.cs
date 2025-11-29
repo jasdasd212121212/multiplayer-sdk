@@ -16,22 +16,27 @@ namespace Positron
 
         private string _host;
         private int _hostPort;
+        private string _uuid;
 
         public PositronUdpClient()
         {
             _brotlit = new BrotlitInteractor();
         }
 
-        public async UniTask Connect(int hostPort, int selfPort, string host)
+        public async UniTask Connect(int hostPort, string uuid, string host)
         {
+            await UniTask.SwitchToMainThread();
+
             _host = host;
             _hostPort = hostPort;
+            _uuid = uuid;
 
-            _client = new(selfPort);
+            int port = Random.Range(40000, 60000);
+            _client = new(port);
 
-            await ConnectAsync();
+            await ConnectAsync(uuid);
 
-            Debug.Log($"UDP connected succesfully. Host: {host} Host port: {hostPort} Self (local client) port: {selfPort}");
+            Debug.Log($"UDP connected succesfully. Host: {host} Host port: {hostPort} Self (local client) port: {port} UUID: {uuid}");
         }
 
         public void Disconnect()
@@ -49,8 +54,8 @@ namespace Positron
 
         public void Send(byte code, string message)
         {
-            byte[] array = { code };
-            SendAsync(array.Concat(Encoding.UTF8.GetBytes(_brotlit.CompressString(message))).ToArray()).Forget();
+            byte[] coddedPreffix = GetCodeAndUuidPreffix(code, _uuid);
+            SendAsync(coddedPreffix.Concat(Encoding.UTF8.GetBytes(_brotlit.CompressString(message))).ToArray()).Forget();
         }
 
         public void AddHandler(IUdpClientMessageHandler handler)
@@ -63,13 +68,15 @@ namespace Positron
             return (T)_messageHandlers.Where(handler => handler.GetType() == typeof(T)).First();
         }
 
-        private async UniTask ConnectAsync()
+        private async UniTask ConnectAsync(string uuid)
         {
             bool connected = false;
 
             while (!connected)
             {
-                await _client.SendAsync(new byte[] { UdpEventsHolder.SET_CONNECTION }, 1, _host, _hostPort);
+                byte[] setConnectionMessage = GetCodeAndUuidPreffix(UdpEventsHolder.SET_CONNECTION, uuid);
+
+                await _client.SendAsync(setConnectionMessage, setConnectionMessage.Length, _host, _hostPort);
 
                 await UniTask.Delay(500);
 
@@ -95,6 +102,7 @@ namespace Positron
                     SplitBuffer(result.Buffer, 1, out byte[] code, out byte[] message);
 
                     string receivedString = _brotlit.DecompressString(Encoding.UTF8.GetString(message).Trim());
+                    Debug.Log(receivedString);
 
                     for (int i = 0; i < _messageHandlers.Count; i++)
                     {
@@ -121,6 +129,20 @@ namespace Positron
         {
             first = array.Take(index).ToArray();
             second = array.Skip(index).ToArray();
+        }
+
+        private byte[] GetCodeAndUuidPreffix(byte code, string uuid)
+        {
+            byte[] codded = new byte[37];
+            byte[] coddedUuid = Encoding.UTF8.GetBytes(uuid);
+            codded[0] = code;
+
+            for (int i = 0; i < coddedUuid.Length; i++)
+            {
+                codded[i + 1] = coddedUuid[i];
+            }
+
+            return codded;
         }
     }
 }

@@ -11,7 +11,7 @@ abstract class udpHandlerBase {
         this.gameServer = initGameServer;
     }
 
-    public abstract handle(message: string, ip: string, port: number): Promise<void>; 
+    public abstract handle(message: string, ip: string, id: string): Promise<void>; 
 }
 
 export { udpHandlerBase }

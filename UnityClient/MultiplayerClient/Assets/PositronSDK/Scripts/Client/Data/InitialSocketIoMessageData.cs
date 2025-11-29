@@ -6,8 +6,8 @@ namespace Positron
     [Serializable]
     public class InitialSocketIoMessageData
     {
-        [SerializeField] private int udp;
+        [SerializeField] private string udp;
 
-        public int UdpPort => udp;
+        public string UdpUUID => udp;
     }
 }
