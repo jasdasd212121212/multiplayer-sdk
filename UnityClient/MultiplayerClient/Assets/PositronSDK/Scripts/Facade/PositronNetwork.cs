@@ -8,10 +8,14 @@ namespace Positron
     {
         private static IPositronClient _client;
         private static SettingsLoader _settingsLoader;
+        private static RoomClient _roomClient;
 
         private static bool _initialized;
 
         public static bool IsConnectedToMaster => _client.IsConnected;
+        public static bool IsHost => _roomClient.IsHost;
+        public static bool InRoom => _roomClient.InRoom;
+        public static IObservableRoomClient Room => _roomClient;
 
         public static void Initialize(IPositronClient client)
         {
@@ -23,10 +27,11 @@ namespace Positron
 
             _settingsLoader = new();
             _client = client;
+            _roomClient = new();
 
             _client.AddHandler(new GetRoomsHandler());
             _client.AddHandler(new RoomCreationHandler());
-            _client.AddHandler(new RoomJoinHandler());
+            _client.AddHandler(new RoomJoinHandler(_roomClient));
 
             _initialized = true;
         }
@@ -68,6 +73,11 @@ namespace Positron
 
         public static void Disconnect()
         {
+            if (InRoom)
+            {
+                _roomClient.LeaveRoom();
+            }
+
             _client.DisconnectFromMaster();
         }
 
@@ -99,6 +109,12 @@ namespace Positron
         public static void JoinRoom(string id)
         {
             _client.Send(ReqestEventNamesHolder.JOIN_ROOM, new RoomJoinRequest(id));
+        }
+
+        public static void LeaveRoom()
+        {
+            _client.Send(ReqestEventNamesHolder.LEAVE_ROOM, "");
+            _roomClient.LeaveRoom();
         }
 
         public static void AddPositronView(IPositronCallbackable view)

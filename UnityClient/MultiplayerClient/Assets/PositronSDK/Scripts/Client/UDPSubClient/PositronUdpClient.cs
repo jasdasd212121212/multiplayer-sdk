@@ -102,7 +102,7 @@ namespace Positron
                     SplitBuffer(result.Buffer, 1, out byte[] code, out byte[] message);
 
                     string receivedString = _brotlit.DecompressString(Encoding.UTF8.GetString(message).Trim());
-                    Debug.Log(receivedString);
+                    Debug.Log($"code: {code[0]} MSG: {receivedString}");
 
                     for (int i = 0; i < _messageHandlers.Count; i++)
                     {

@@ -5,15 +5,19 @@ namespace Positron
 {
     public class RoomJoinHandler : IClientMessageHandler
     {
+        private RoomClient _roomClient;
+
         public string EventName => EventNamesHolder.JOINED_INTO_ROOM;
+
+        public RoomJoinHandler(RoomClient roomClient)
+        {
+            _roomClient = roomClient;
+        }
 
         public void Process(string data, PositronCallbacksPresenter presenter)
         {
             RoomJoinResponse response = JsonUtility.FromJson<RoomJoinResponse>(data);
-
-            // make here stuff of init scene, variables and events etc.
-            SceneManager.LoadScene(response.SceneIndex);
-            Debug.Log(response.SceneIndex);
+            _roomClient.PerformJoin(response);
 
             presenter.ForEachView(view => 
             {

@@ -2,7 +2,6 @@ import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
 import { IGameConfig } from "../../CfgSchemas/IGameConfig.js";
 import { udpEventsList } from "../../UDP/udpEventsList.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
-import { responseEventsList } from "../Server/responseEventsList.js";
 import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { room } from "./room.js";
@@ -21,6 +20,10 @@ class roomTicker{
     }
 
     public start(): void{
+        if (this.tickrate <= 0){
+            return;
+        }
+
         setInterval(async () => 
             { 
                 await this.onTick(); 
