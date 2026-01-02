@@ -31,8 +31,9 @@ namespace Positron
             RoomHostTransferHandler hostTransferHandler = new();
             RoomObjectsTranferHandler objectsTansferHandler = new();
             RemoveObjectHandler objectRemoveHandler = new();
+            ObjectCreateHandler objectCreateHandler = new();
 
-            _roomClient = new(hostTransferHandler, objectsTansferHandler, objectRemoveHandler, _client);
+            _roomClient = new(hostTransferHandler, objectsTansferHandler, objectRemoveHandler, objectCreateHandler, _client);
 
             _client.AddHandler(new GetRoomsHandler());
             _client.AddHandler(new RoomCreationHandler());
@@ -124,9 +125,9 @@ namespace Positron
             _roomClient.LeaveRoom();
         }
 
-        public static PositronNetworkObject SpawnObject(PositronNetworkObject prefab)
+        public static PositronNetworkObject SpawnObject(string assetPath, Vector3 position, Vector3 rotation)
         {
-            return _roomClient.SpawnObject(prefab);
+            return _roomClient.SpawnObject(assetPath, position, rotation);
         }
 
         public static void DestroyObject(PositronNetworkObject obj)

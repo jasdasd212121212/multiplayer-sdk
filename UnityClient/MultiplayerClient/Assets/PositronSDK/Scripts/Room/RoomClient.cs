@@ -26,6 +26,7 @@ namespace Positron
             RoomHostTransferHandler hostTransferHandler, 
             RoomObjectsTranferHandler objectsTansferHandler, 
             RemoveObjectHandler objectRemoveHandler, 
+            ObjectCreateHandler objectCreateHandler,
             IPositronClient transportClient)
         {
             _objectsModel = new();
@@ -33,6 +34,7 @@ namespace Positron
             hostTransferHandler.hostTransfered += OnHostTransfer;
             objectsTansferHandler.objectsTransfered += OnObjectsTransfered;
             objectRemoveHandler.objectDestroyed += OnObjectRemoved;
+            objectCreateHandler.objectCreated += OnObjectCreated;
             _transportClient = transportClient;
         }
 
@@ -55,9 +57,17 @@ namespace Positron
             roomLeft?.Invoke();
         }
 
-        public PositronNetworkObject SpawnObject(PositronNetworkObject prefab)
+        public PositronNetworkObject SpawnObject(string assetPath, Vector3 position, Vector3 rotation)
         {
-            return null;
+            PositronNetworkObject created = _objectsModel.Spawn(assetPath, _clientId, position, rotation, out string cguid);
+
+            if (created == null)
+            {
+                return null;
+            }
+
+            _transportClient.Send(RequestEventNamesHolder.CREATE_OBJECT, new ObjectCreationRequest(assetPath, cguid, position, rotation));
+            return created;
         }
 
         public void DestroyObject(PositronNetworkObject obj)
@@ -112,6 +122,14 @@ namespace Positron
             }
 
             _objectsModel.DestroyObject(_objectsModel.FindObjectById(response.ObjectId));
+        }
+
+        private void OnObjectCreated(ObjectCreationResponseData data)
+        {
+            if (!_objectsModel.TryInitByCguid(data.Cguid, data.NetworkObjectData))
+            {
+                _objectsModel.Spawn(data.NetworkObjectData);
+            }
         }
     }
 }

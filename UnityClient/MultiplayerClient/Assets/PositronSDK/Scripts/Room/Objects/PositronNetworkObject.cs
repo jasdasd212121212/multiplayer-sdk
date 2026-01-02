@@ -15,6 +15,7 @@ namespace Positron
         public int ObjectId { get; private set; } = -1;
         public int SubObjectId { get; private set; } = -1;
         public bool IsMine => OwnerId == PositronNetwork.Room.SelfId;
+        public bool IsFullyInitialized => OwnerId != -1 && (ObjectId != -1 || SubObjectId != -1);
         public bool IsOwnedByHost => OwnerId == PositronNetwork.Room.HostId;
 
         public void Init(int ownerClientId, int objectId)

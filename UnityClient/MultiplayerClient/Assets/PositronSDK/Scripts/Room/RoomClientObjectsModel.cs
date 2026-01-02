@@ -1,11 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using System;
 
 namespace Positron
 {
     public sealed class RoomClientObjectsModel
     {
         private readonly Dictionary<int, PositronNetworkObject> _roomObjects = new();
+        private readonly Dictionary<string, PositronNetworkObject> _cguidObjectsPool = new();
 
         public void SpawnMany(RoomObjectData[] objects)
         {
@@ -38,6 +41,40 @@ namespace Positron
             _roomObjects.Add(networkSpawned.ObjectId, networkSpawned);
 
             return spawned;
+        }
+
+        public PositronNetworkObject Spawn(string resourcePath, int clientId, Vector3 position, Vector3 rotation, out string creationGuid)
+        {
+            GameObject prefab = Resources.Load<GameObject>(resourcePath);
+
+            if (prefab == null)
+            {
+                Debug.LogError($"Critical positron error -> can`t spawn non existing in '{resourcePath}' path object !");
+                creationGuid = string.Empty;
+                return null;
+            }
+
+            Guid cguid = Guid.NewGuid();
+
+            PositronNetworkObject obj = GameObject.Instantiate(prefab, position, Quaternion.Euler(rotation)).GetComponent<PositronNetworkObject>();
+            obj.Init(clientId, cguid.ToString());
+
+            _cguidObjectsPool.Add(cguid.ToString(), obj);
+
+            creationGuid = cguid.ToString();
+            return obj;
+        }
+
+        public bool TryInitByCguid(string cguid, RoomObjectData data)
+        {
+            if (_cguidObjectsPool.ContainsKey(cguid))
+            {
+                _cguidObjectsPool[cguid].InitObjectId(data.ObjectId);
+                _cguidObjectsPool.Remove(cguid);
+                return true;
+            }
+
+            return false;
         }
 
         public PositronNetworkObject FindObjectById(int id)
