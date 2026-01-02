@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using System;
 
 namespace Positron
@@ -69,8 +68,12 @@ namespace Positron
         {
             if (_cguidObjectsPool.ContainsKey(cguid))
             {
-                _cguidObjectsPool[cguid].InitObjectId(data.ObjectId);
+                PositronNetworkObject obj = _cguidObjectsPool[cguid];
+                obj.InitObjectId(data.ObjectId);
+                RegisterObject(obj);
+
                 _cguidObjectsPool.Remove(cguid);
+
                 return true;
             }
 
@@ -101,5 +104,22 @@ namespace Positron
         }
 
         public bool ContainsObjectById(int id) => _roomObjects.ContainsKey(id);
+
+        private void RegisterObject(PositronNetworkObject obj)
+        {
+            if (obj == null)
+            {
+                Debug.LogError($"Positron error -> can`t register null object !!!");
+                return;
+            }
+
+            if (_roomObjects.ContainsKey(obj.ObjectId))
+            {
+                Debug.LogError($"Positron error -> can`t register objt ({obj.gameObject.name}) with id '{obj.ObjectId}' twice !");
+                return;
+            }
+
+            _roomObjects.Add(obj.ObjectId, obj);
+        }
     }
 }

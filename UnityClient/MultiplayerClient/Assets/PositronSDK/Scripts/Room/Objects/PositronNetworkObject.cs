@@ -26,7 +26,7 @@ namespace Positron
                 return;
             }
 
-            if (GetComponentInParent<PositronNetworkObject>())
+            if (IsSubObject())
             {
                 Debug.LogError($"Positron error -> can`t init sub object");
                 return;
@@ -44,7 +44,7 @@ namespace Positron
 
         public void Init(int ownerClientId, string cguid)
         {
-            if (GetComponentInParent<PositronNetworkObject>())
+            if (IsSubObject())
             {
                 Debug.LogError($"Positron error -> can`t init sub object");
                 return;
@@ -92,8 +92,19 @@ namespace Positron
 
             for (int i = 0; i < subObjects.Length; i++)
             {
+                if (subObjects[i].gameObject == gameObject)
+                {
+                    continue;
+                }
+
                 subObjects[i].SubObjectId = ObjectId + 1 + i;
             }
+        }
+
+        private bool IsSubObject()
+        {
+            PositronNetworkObject parentObjet = GetComponentInParent<PositronNetworkObject>();
+            return parentObjet != null && parentObjet.gameObject != gameObject;
         }
     }
 }

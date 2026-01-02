@@ -8,15 +8,15 @@ namespace Positron
     {
         [SerializeField] private string asset;
         [SerializeField] private string cguid;
-        [SerializeField] private Vector3 position;
-        [SerializeField] private Vector3 rotation;
+        [SerializeField] private NetVector3 position;
+        [SerializeField] private NetVector3 rotation;
 
         public ObjectCreationRequest(string assetPath, string cguid, Vector3 position, Vector3 rotation)
         {
             asset = assetPath;
             this.cguid = cguid;
-            this.position = position;
-            this.rotation = rotation;
+            this.position = new(position.x, position.y, position.z);
+            this.rotation = new(rotation.x, rotation.y, rotation.z);
         }
     }
 }

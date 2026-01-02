@@ -32,6 +32,7 @@ class room{
 
     private currentPlayersCount: number;
     private maximalPlayersCount: number;
+    private wasConnectedEarly: boolean;
 
     private ticker: roomTicker = null;
     private raiseEventDispatcher: raiseEventor = null;
@@ -170,9 +171,16 @@ class room{
         }
 
         this.clientsMap.set(connection.getSocket().id, connection);
+        this.updateClientsArray();
+
         this.currentPlayersCount++;
 
-        this.updateClientsArray();
+        if(this.wasConnectedEarly && (this.currentPlayersCount - 1) == 0 && this.objectsArray.length > 0){
+            this.transferObjectNonEmit(this.objectsArray[0].getClientId(), connection.getId());
+            this.transferHost();
+        }
+
+        this.wasConnectedEarly = true;
     }
 
     public async removeConnection(client: client): Promise<void> {
@@ -184,10 +192,8 @@ class room{
             this.lastPlayerDisconnectTime = new Date().getTime();
 
             if(this.getHostClientId() == client.getId() && this.getConnectionsCount() > 0){
-                let packet: string = await JsonCompressor.instance.stringify({ targetId: this.getHostClientId() });
-                
                 this.transferHost();
-                this.broadcast(responseEventsList.roomHostTransfered, packet);
+                this.broadcast(responseEventsList.roomHostTransfered, await JsonCompressor.instance.stringify({ targetId: this.getHostClientId() }));
             }
 
             if(this.getConnectionsCount() > 0){
@@ -255,6 +261,15 @@ class room{
     }
 
     private async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
+        let transfered: Array<number> = this.transferObjectNonEmit(sourceId, destinationId);
+
+        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
+            tarnsferedToClient: destinationId, 
+            objects: transfered
+        }));
+    }
+
+    private transferObjectNonEmit(sourceId: number, destinationId: number): Array<number> {
         let transferdObjects: Array<number> = [];
         
         for(let i: number = 0; i < this.objects.size; i++){
@@ -264,10 +279,7 @@ class room{
             }
         }
 
-        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
-            tarnsferedToClient: destinationId, 
-            objects: transferdObjects
-        }));
+        return transferdObjects;
     }
 
     private transferHost(): client{

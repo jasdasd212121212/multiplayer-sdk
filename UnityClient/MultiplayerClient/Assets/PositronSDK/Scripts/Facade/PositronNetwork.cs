@@ -40,6 +40,8 @@ namespace Positron
             _client.AddHandler(new RoomJoinHandler(_roomClient));
             _client.AddHandler(hostTransferHandler);
             _client.AddHandler(objectsTansferHandler);
+            _client.AddHandler(objectRemoveHandler);
+            _client.AddHandler(objectCreateHandler);
 
             _initialized = true;
         }

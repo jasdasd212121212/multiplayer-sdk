@@ -72,9 +72,15 @@ namespace Positron
 
         public void DestroyObject(PositronNetworkObject obj)
         {
-            if (InRoom || obj.ObjectId == -1)
+            if (!InRoom || obj.ObjectId == -1)
             {
                 Debug.LogError($"Positron error -> can`t destroy object InRoom: {InRoom} objID: {obj.ObjectId}");
+                return;
+            }
+
+            if (obj.OwnerId != _clientId)
+            {
+                Debug.LogError($"Critical positron error -> can`t remove foreign object !!! Chek ownership !!!");
                 return;
             }
 
@@ -97,7 +103,7 @@ namespace Positron
 
         private void OnHostTransfer(int newHost)
         {
-            _hostId = newHost;    
+            _hostId = newHost;
         }
 
         private void OnObjectsTransfered(ObjectsTransferResponse transferData)
@@ -116,11 +122,11 @@ namespace Positron
 
         private void OnObjectRemoved(RemoveObjectResponse response)
         {
-            if (_objectsModel.ContainsObjectById(response.ObjectId))
+            if (!_objectsModel.ContainsObjectById(response.ObjectId))
             {
                 return;
             }
-
+            
             _objectsModel.DestroyObject(_objectsModel.FindObjectById(response.ObjectId));
         }
 
