@@ -120,7 +120,7 @@ request: disconnect or LeaveRoom
 EMPTY
 ```
 
-response: standart disconnect or roomLeaved
+response: disconnect or roomLeaved
 ```
 EMPTY
 ```

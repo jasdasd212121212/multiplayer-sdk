@@ -9,7 +9,6 @@ import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { server } from "../Server/server.js";
-import { INetVariable } from "./Variables/Interfaces/INetVariable.js";
 import { netVariablesRepository } from "./Variables/netVariablesRepository.js";
 
 class room{
@@ -107,6 +106,8 @@ class room{
     }
 
     public removeObject(obj: gameObject): void{
+        this.variablesRespository.removeVariablesFromObject(obj.getObjectId());
+
         this.objects.delete(obj.getObjectId());
         this.updateObjectsArray();
     }
@@ -168,7 +169,7 @@ class room{
         this.currentPlayersCount++;
     }
 
-    public removeConnection(client: client): void{
+    public async removeConnection(client: client): Promise<void> {
         const index = this.clients.indexOf(client, 0);
         if (index > -1) {
             this.clients.splice(index, 1);
@@ -176,6 +177,17 @@ class room{
 
         this.currentPlayersCount--;
         this.lastPlayerDisconnectTime = new Date().getTime();
+
+        if(this.getHostClientId() == client.getId() && this.getConnectionsCount() > 0){
+            let packet: string = await JsonCompressor.instance.stringify({ targetId: this.getHostClientId() });
+            
+            this.transferHost();
+            this.broadcast(responseEventsList.roomHostTransfered, packet);
+        }
+
+        if(this.getConnectionsCount() > 0){
+            await this.transferAllObjects(client.getId(), this.getHostClientId());
+        }
     }
 
     public validByConnectionsCount(): boolean{
@@ -205,28 +217,6 @@ class room{
         return null;
     }
 
-    public async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
-        let transferdObjects: Array<number> = [];
-        
-        for(let i: number = 0; i < this.objects.size; i++){
-            if(this.objectsArray[i].getClientId() == sourceId){
-                this.objectsArray[i].transferTo(destinationId);
-                transferdObjects.push(this.objectsArray[i].getObjectId());
-            }
-        }
-
-        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
-            tarnsferedToClient: destinationId, 
-            objects: transferdObjects
-        }));
-    }
-
-    public transferHost(): client{
-        this.hostClientId = this.clients[0].getId();
-
-        return this.clients[0];
-    }
-
     public broadcast(event: string, message: string): void{
         for(let i: number = 0; i < this.clients.length; i++){
             this.clients[i].getSocket().emit(event, message);
@@ -251,6 +241,28 @@ class room{
 
     private updateObjectsArray(): void{
         this.objectsArray = Array.from(this.objects.values());
+    }
+
+    private async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
+        let transferdObjects: Array<number> = [];
+        
+        for(let i: number = 0; i < this.objects.size; i++){
+            if(this.objectsArray[i].getClientId() == sourceId){
+                this.objectsArray[i].transferTo(destinationId);
+                transferdObjects.push(this.objectsArray[i].getObjectId());
+            }
+        }
+
+        this.broadcast(responseEventsList.objectsTransfered, await JsonCompressor.instance.stringify({
+            tarnsferedToClient: destinationId, 
+            objects: transferdObjects
+        }));
+    }
+
+    private transferHost(): client{
+        this.hostClientId = this.clients[0].getId();
+
+        return this.clients[0];
     }
 }
 

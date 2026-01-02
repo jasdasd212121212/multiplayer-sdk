@@ -27,11 +27,18 @@ namespace Positron
 
             _settingsLoader = new();
             _client = client;
-            _roomClient = new();
+
+            RoomHostTransferHandler hostTransferHandler = new();
+            RoomObjectsTranferHandler objectsTansferHandler = new();
+            RemoveObjectHandler objectRemoveHandler = new();
+
+            _roomClient = new(hostTransferHandler, objectsTansferHandler, objectRemoveHandler, _client);
 
             _client.AddHandler(new GetRoomsHandler());
             _client.AddHandler(new RoomCreationHandler());
             _client.AddHandler(new RoomJoinHandler(_roomClient));
+            _client.AddHandler(hostTransferHandler);
+            _client.AddHandler(objectsTansferHandler);
 
             _initialized = true;
         }
@@ -93,7 +100,7 @@ namespace Positron
                 return;
             }
 
-            _client.Send(ReqestEventNamesHolder.GET_ROOMS_LIST, "");
+            _client.Send(RequestEventNamesHolder.GET_ROOMS_LIST, "");
         }
 
         public static void CreateRoom(string name, int sceneIndex, int maxPlayers, object externalData = null)
@@ -103,18 +110,28 @@ namespace Positron
                 return;
             }
 
-            _client.Send(ReqestEventNamesHolder.CREATE_ROOM, new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData));
+            _client.Send(RequestEventNamesHolder.CREATE_ROOM, new RoomCreationRequestData(name, sceneIndex, maxPlayers, externalData));
         }
 
         public static void JoinRoom(string id)
         {
-            _client.Send(ReqestEventNamesHolder.JOIN_ROOM, new RoomJoinRequest(id));
+            _client.Send(RequestEventNamesHolder.JOIN_ROOM, new RoomJoinRequest(id));
         }
 
         public static void LeaveRoom()
         {
-            _client.Send(ReqestEventNamesHolder.LEAVE_ROOM, "");
+            _client.Send(RequestEventNamesHolder.LEAVE_ROOM, "");
             _roomClient.LeaveRoom();
+        }
+
+        public static PositronNetworkObject SpawnObject(PositronNetworkObject prefab)
+        {
+            return _roomClient.SpawnObject(prefab);
+        }
+
+        public static void DestroyObject(PositronNetworkObject obj)
+        {
+            _roomClient.DestroyObject(obj);
         }
 
         public static void AddPositronView(IPositronCallbackable view)

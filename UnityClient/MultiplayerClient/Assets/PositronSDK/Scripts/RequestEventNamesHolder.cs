@@ -1,6 +1,6 @@
 namespace Positron
 {
-    public static class ReqestEventNamesHolder
+    public static class RequestEventNamesHolder
     {
         public static readonly string CREATE_ROOM = "CreateRoom";
         public static readonly string JOIN_ROOM = "JoinRoom";

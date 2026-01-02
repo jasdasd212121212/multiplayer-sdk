@@ -42,7 +42,7 @@ class netVariablesRepository{
     }
 
     public async removeVariablesFromObject(objectId: number): Promise<void> {
-        let variabesIndexes: Array<number> = this.tryFindVariablesByObjectID(1);
+        let variabesIndexes: Array<number> = this.tryFindVariablesByObjectID(objectId);
         let deletedBuffer: Array<string> = new Array();
 
         while(variabesIndexes.length > 0){

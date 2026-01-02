@@ -37,5 +37,6 @@ namespace Positron
         public virtual void OnConnectedToMaster() { }
         public virtual void OnRoomCreated(RoomCreationResponse createdRoomResponse) { }
         public virtual void OnRoomJoined(RoomJoinResponse room) { }
+        public virtual void HostTransfered() { }
     }
 }

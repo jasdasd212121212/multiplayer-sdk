@@ -3,7 +3,6 @@ import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { room } from "../../Room/room.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
-import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 import { server } from "../server.js";
 
 class roomDisconnectHandler extends serverEventHandlerBase {
@@ -22,17 +21,7 @@ class roomDisconnectHandler extends serverEventHandlerBase {
         if(room != null && room != undefined){
             clientConnection = room.findClientBySocket(sourceSocket);
 
-            room.removeConnection(clientConnection);
-
-            if(room.getHostClientId() == clientConnection.getId() && room.getConnectionsCount() > 0){
-                room.transferHost();
-                room.broadcast(responseEventsList.roomHostTransfered, await JsonCompressor.instance.stringify({ targetId: room.getHostClientId() }));
-            }
-
-            if(room.getConnectionsCount() > 0){
-                await room.transferAllObjects(clientConnection.getId(), room.getHostClientId());
-            }
-
+            await room.removeConnection(clientConnection);
             this.server.deleteCachedConnection(sourceSocket);
 
             console.log(`Client: ${clientConnection.getId()} was disconnected from room: ${room.getId()}`);
@@ -42,7 +31,9 @@ class roomDisconnectHandler extends serverEventHandlerBase {
                     sourceSocket.emit(responseEventsList.roomLeaved);
                 }
             }
-            catch {}
+            catch(err) {
+                console.error(err);
+            }
         }
 
         room = null;

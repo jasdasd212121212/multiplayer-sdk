@@ -4,7 +4,7 @@ namespace Positron
 {
     public class PositronNetworkObject : MonoBehaviour
     {
-        private Vector2 _position;
+        private Vector3 _position;
         private Vector3 _rotation;
 
         private string _creationGuid = string.Empty;
@@ -13,9 +13,10 @@ namespace Positron
 
         public int OwnerId { get; private set; } = -1;
         public int ObjectId { get; private set; } = -1;
+        public int SubObjectId { get; private set; } = -1;
         public bool IsMine => OwnerId == PositronNetwork.Room.SelfId;
         public bool IsOwnedByHost => OwnerId == PositronNetwork.Room.HostId;
-    
+
         public void Init(int ownerClientId, int objectId)
         {
             if (_isInitialized)
@@ -24,16 +25,30 @@ namespace Positron
                 return;
             }
 
+            if (GetComponentInParent<PositronNetworkObject>())
+            {
+                Debug.LogError($"Positron error -> can`t init sub object");
+                return;
+            }
+
             _position = transform.position;
             _rotation = transform.eulerAngles;
             OwnerId = ownerClientId;
             ObjectId = objectId;
-        
+
+            InitializeSubObjects();
+
             _isInitialized = true;
         }
 
         public void Init(int ownerClientId, string cguid)
         {
+            if (GetComponentInParent<PositronNetworkObject>())
+            {
+                Debug.LogError($"Positron error -> can`t init sub object");
+                return;
+            }
+
             if (string.IsNullOrEmpty(_creationGuid) && !string.IsNullOrEmpty(cguid) && !_isInitialized)
             {
                 Init(ownerClientId, -1);
@@ -46,6 +61,7 @@ namespace Positron
             if (ObjectId == -1 && objId != -1)
             {
                 ObjectId = objId;
+                InitializeSubObjects();
             }
         }
 
@@ -54,6 +70,7 @@ namespace Positron
             if (OwnerId != newOwner)
             {
                 OwnerId = newOwner;
+                InitializeSubObjects();
             }
         }
 
@@ -65,8 +82,17 @@ namespace Positron
 
         private void Update()
         {
-            transform.position = _position;
-            transform.rotation = Quaternion.Euler(_rotation);
+            transform.SetPositionAndRotation(_position, Quaternion.Euler(_rotation));
+        }
+
+        private void InitializeSubObjects()
+        {
+            PositronNetworkObject[] subObjects = GetComponentsInChildren<PositronNetworkObject>();
+
+            for (int i = 0; i < subObjects.Length; i++)
+            {
+                subObjects[i].SubObjectId = ObjectId + 1 + i;
+            }
         }
     }
 }
