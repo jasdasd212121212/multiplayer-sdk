@@ -14,9 +14,13 @@ import { netVariablesRepository } from "./Variables/netVariablesRepository.js";
 class room{
     private name: string;
     private externalData: object;
+
     private objects: Map<number, gameObject> = new Map();
     private objectsArray: Array<gameObject> = [];
-    private clients: Array<client> = [];
+
+    private clientsMap: Map<string, client> = new Map();
+    private clientsArray: Array<client> = [];
+
     private roomId: string;
     private nextId: number = 0;
     private nextObjectId: number = 0; 
@@ -165,28 +169,33 @@ class room{
             this.hostClientId = connection.getId();
         }
 
-        this.clients.push(connection);
+        this.clientsMap.set(connection.getSocket().id, connection);
         this.currentPlayersCount++;
+
+        this.updateClientsArray();
     }
 
     public async removeConnection(client: client): Promise<void> {
-        const index = this.clients.indexOf(client, 0);
-        if (index > -1) {
-            this.clients.splice(index, 1);
+        if(this.clientsMap.has(client.getSocket().id)){
+            this.clientsMap.delete(client.getSocket().id);
+            this.updateClientsArray();
+        
+            this.currentPlayersCount--;
+            this.lastPlayerDisconnectTime = new Date().getTime();
+
+            if(this.getHostClientId() == client.getId() && this.getConnectionsCount() > 0){
+                let packet: string = await JsonCompressor.instance.stringify({ targetId: this.getHostClientId() });
+                
+                this.transferHost();
+                this.broadcast(responseEventsList.roomHostTransfered, packet);
+            }
+
+            if(this.getConnectionsCount() > 0){
+                await this.transferAllObjects(client.getId(), this.getHostClientId());
+            }
         }
-
-        this.currentPlayersCount--;
-        this.lastPlayerDisconnectTime = new Date().getTime();
-
-        if(this.getHostClientId() == client.getId() && this.getConnectionsCount() > 0){
-            let packet: string = await JsonCompressor.instance.stringify({ targetId: this.getHostClientId() });
-            
-            this.transferHost();
-            this.broadcast(responseEventsList.roomHostTransfered, packet);
-        }
-
-        if(this.getConnectionsCount() > 0){
-            await this.transferAllObjects(client.getId(), this.getHostClientId());
+        else{
+            console.error("Try to remove not registred client !!!");
         }
     }
 
@@ -195,11 +204,11 @@ class room{
     }
 
     public getConnection(index: number): client{
-        return this.clients[index];
+        return this.clientsArray[index];
     }
 
     public getConnectionsCount(): number{
-        return this.clients.length;
+        return this.clientsArray.length;
     }
 
     public generateClientId(): number{
@@ -208,30 +217,28 @@ class room{
     }
 
     public findClientBySocket(socket: Socket): client{
-        for(let i: number = 0; i < this.clients.length; i++){
-            if(this.clients[i].getSocket() == socket){
-                return this.clients[i];
-            }
+        if(this.clientsMap.has(socket.id)){
+            return this.clientsMap.get(socket.id);
         }
 
         return null;
     }
 
     public broadcast(event: string, message: string): void{
-        for(let i: number = 0; i < this.clients.length; i++){
-            this.clients[i].getSocket().emit(event, message);
+        for(let i: number = 0; i < this.clientsArray.length; i++){
+            this.clientsArray[i].getSocket().emit(event, message);
         }
     }
 
     public broadcastUdp(event: number, message: string){
-        for(let i: number = 0; i < this.clients.length; i++){
-            this.gameServer.udpSend(event, message, this.clients[i].getSocket());
+        for(let i: number = 0; i < this.clientsArray.length; i++){
+            this.gameServer.udpSend(event, message, this.clientsArray[i].getSocket());
         }
     }
 
     public castOthers(event: string, message: string, sourceSocket: Socket){
-        for(let i: number = 0; i < this.clients.length; i++){
-            let target: Socket = this.clients[i].getSocket();
+        for(let i: number = 0; i < this.clientsArray.length; i++){
+            let target: Socket = this.clientsArray[i].getSocket();
             
             if(target.id != sourceSocket.id){
                 target.emit(event, message);
@@ -241,6 +248,10 @@ class room{
 
     private updateObjectsArray(): void{
         this.objectsArray = Array.from(this.objects.values());
+    }
+
+    private updateClientsArray(): void {
+        this.clientsArray = Array.from(this.clientsMap.values());
     }
 
     private async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
@@ -260,9 +271,9 @@ class room{
     }
 
     private transferHost(): client{
-        this.hostClientId = this.clients[0].getId();
+        this.hostClientId = this.clientsArray[0].getId();
 
-        return this.clients[0];
+        return this.clientsArray[0];
     }
 }
 
