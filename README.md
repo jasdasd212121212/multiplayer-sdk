@@ -268,61 +268,65 @@ response: netVarsRemoval
 }
 ```
 
-## Create object
-request: CreateObject
+## Create or delte object batched
+request: CreateOrDeleteObjects
 ```
 {
-    "asset": "asset path",
-    "cguid": "unity GUID",
+    "creation": [
+        {
+            "asset": "asset path",
+            "cguid": "unity GUID",
 
-    "position":{
-        "x": 0,
-        "y": 0,
-        "z": 0
-    },
+            "position":{
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
 
-    "rotation":{
-        "x": 0,
-        "y": 0,
-        "z": 0
-    }
-}
-```
-
-response: objectCreated
-```
-{
-    "cguid": "unity guid",
-    "data":{
-        "a": "asset path",
-        "i": -1,
-        "c": -1,
-        "p":{
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
-        "r":{
-            "x": 0,
-            "y": 0,
-            "z": 0
+            "rotation":{
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
         }
-    }
+    ],
+    "deletion": [
+        {
+            "id": 0, 
+            "client": 1
+        }
+    ]
 }
 ```
 
-## Remove object
-request: DeleteObject
+response: objectActBatched
 ```
 {
-    "id": 0, 
-    "client": 1
-}
-```
-response: objectDeleted
-```
-{
-    "id": 0
+    "created": [
+        {
+            "cguid": "unity guid",
+            "data":{
+                "a": "asset path",
+                "i": -1,
+                "c": -1,
+                "p":{
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "r":{
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                }
+            }
+        }
+    ],
+    "deleted": [
+        {
+            "id": 0
+        }
+    ]
 }
 ```
 
