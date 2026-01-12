@@ -3,10 +3,8 @@ import { CfgLoader } from "./CfgLoader/CfgLoader.js";
 import { addOrModifyVariablesHandler } from "./GameNetworking/Server/Handlers/addOrModifyVariablesHandler.js";
 import { serverEventHandlerBase } from "./GameNetworking/Server/Handlers/Base/serverEventHandlerBase.js";
 import { changeRoomSceneHandler } from "./GameNetworking/Server/Handlers/changeRoomSceneHandler.js";
-import { createObjectHandler } from "./GameNetworking/Server/Handlers/createObjectHandler.js";
 import { getRoomsListHandler } from "./GameNetworking/Server/Handlers/getRoomsListHandler.js";
 import { raiseEventHandler } from "./GameNetworking/Server/Handlers/raiseEventHandler.js";
-import { removeObjectHandler } from "./GameNetworking/Server/Handlers/removeObjectHandler.js";
 import { removeVariablesFromObjectHandler } from "./GameNetworking/Server/Handlers/removeVariablesFromObjectHandler.js";
 import { roomCreationHandler } from "./GameNetworking/Server/Handlers/roomCreationHandler.js";
 import { roomDisconnectHandler } from "./GameNetworking/Server/Handlers/roomDisconnectHandler.js";
@@ -33,14 +31,12 @@ let udpHandlers: Array<udpHandlerBase> = [];
 handlers.push(new roomCreationHandler(gameServer));
 handlers.push(new roomJoinHandler(gameServer));
 handlers.push(new roomDisconnectHandler(gameServer));
-handlers.push(new createObjectHandler(gameServer));
-handlers.push(new removeObjectHandler(gameServer));
+handlers.push(new createOrDeleteObjectsHandler(gameServer));
 handlers.push(new getRoomsListHandler(gameServer));
 handlers.push(new raiseEventHandler(gameServer));
 handlers.push(new changeRoomSceneHandler(gameServer));
 handlers.push(new addOrModifyVariablesHandler(gameServer));
 handlers.push(new removeVariablesFromObjectHandler(gameServer));
-handlers.push(new createOrDeleteObjectsHandler(gameServer));
 
 middlewares.push(new authKeyMiddleware());
 

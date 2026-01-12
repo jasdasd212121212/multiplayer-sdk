@@ -1,4 +1,6 @@
+using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,9 +9,10 @@ namespace Positron
     public sealed class RoomClient : IObservableRoomClient
     {
         private readonly RoomClientObjectsModel _objectsModel;
-        private readonly IPositronClient _transportClient;
+        private readonly RoomObjectsModififcationBuffer _modificationBuffer;
 
         private RoomJoinResponse _roomData;
+        private CancellationTokenSource _tickLoopCancellationToken;
 
         private int _clientId;
         private int _hostId;
@@ -25,17 +28,15 @@ namespace Positron
         public RoomClient(
             RoomHostTransferHandler hostTransferHandler, 
             RoomObjectsTranferHandler objectsTansferHandler, 
-            RemoveObjectHandler objectRemoveHandler, 
-            ObjectCreateHandler objectCreateHandler,
+            RoomObjectsBatchedModificationHandler modificationHandler,
             IPositronClient transportClient)
         {
             _objectsModel = new();
 
             hostTransferHandler.hostTransfered += OnHostTransfer;
             objectsTansferHandler.objectsTransfered += OnObjectsTransfered;
-            objectRemoveHandler.objectDestroyed += OnObjectRemoved;
-            objectCreateHandler.objectCreated += OnObjectCreated;
-            _transportClient = transportClient;
+            modificationHandler.receivedModificationBatch += OnReceiveObjectsModification;
+            _modificationBuffer = new(transportClient);
         }
 
         public void PerformJoin(RoomJoinResponse data)
@@ -54,6 +55,8 @@ namespace Positron
             }
 
             InRoom = false;
+            _tickLoopCancellationToken.Cancel();
+
             roomLeft?.Invoke();
         }
 
@@ -66,7 +69,7 @@ namespace Positron
                 return null;
             }
 
-            _transportClient.Send(RequestEventNamesHolder.CREATE_OBJECT, new ObjectCreationRequest(assetPath, cguid, position, rotation));
+            _modificationBuffer.AddCreationRequest(new ObjectCreationRequest(assetPath, cguid, position, rotation));
             return created;
         }
 
@@ -85,7 +88,7 @@ namespace Positron
             }
 
             _objectsModel.DestroyObject(obj);
-            _transportClient.Send(RequestEventNamesHolder.DELETE_OBJECT, new RemoveObjectRequest(obj.ObjectId, _clientId));
+            _modificationBuffer.AddRemoveRequest(new RemoveObjectRequest(obj.ObjectId, _clientId));
         }
 
         private void OnSceneLoaded(Scene _, LoadSceneMode __)
@@ -98,7 +101,21 @@ namespace Positron
             InRoom = true;
             roomInitialized?.Invoke();
 
+            _tickLoopCancellationToken = new();
+            TickLoop().Forget();
+
             SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private async UniTask TickLoop()
+        {
+            await UniTask.SwitchToMainThread();
+
+            while (InRoom)
+            {
+                await UniTask.WaitForSeconds(1f / _roomData.Tickrate, cancellationToken: _tickLoopCancellationToken.Token);
+                _modificationBuffer.Flush();
+            }
         }
 
         private void OnHostTransfer(int newHost)
@@ -120,21 +137,24 @@ namespace Positron
             }
         }
 
-        private void OnObjectRemoved(RemoveObjectResponse response)
+        private void OnReceiveObjectsModification(RoomObjectsModificationResponse response)
         {
-            if (!_objectsModel.ContainsObjectById(response.ObjectId))
+            for (int i = 0; i < response.DeleteResponse.Length; i++)
             {
-                return;
-            }
-            
-            _objectsModel.DestroyObject(_objectsModel.FindObjectById(response.ObjectId));
-        }
+                if (!_objectsModel.ContainsObjectById(response.DeleteResponse[i].ObjectId))
+                {
+                    return;
+                }
 
-        private void OnObjectCreated(ObjectCreationResponseData data)
-        {
-            if (!_objectsModel.TryInitByCguid(data.Cguid, data.NetworkObjectData))
+                _objectsModel.DestroyObject(_objectsModel.FindObjectById(response.DeleteResponse[i].ObjectId));
+            }
+
+            for (int i = 0; i < response.CreationResponse.Length; i++)
             {
-                _objectsModel.Spawn(data.NetworkObjectData);
+                if (!_objectsModel.TryInitByCguid(response.CreationResponse[i].Cguid, response.CreationResponse[i].NetworkObjectData))
+                {
+                    _objectsModel.Spawn(response.CreationResponse[i].NetworkObjectData);
+                }
             }
         }
     }

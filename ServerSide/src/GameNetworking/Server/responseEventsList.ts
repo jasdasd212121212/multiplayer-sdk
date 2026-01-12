@@ -4,11 +4,11 @@ export const responseEventsList = {
     roomHostTransfered: "roomHostTransfer",
     objectsTransfered: "roomObjectsTransfered",
     objectsTick: "objectsTick",
-    objectCreated: "objectCreated",
+    //objectCreated: "objectCreated",
     roomCreated: "roomCreated",
     playerConnected: "newConnection",
     roomCreationReject: "roomCreateReject",
-    objectRemoved: "objectDeleted",
+    //objectRemoved: "objectDeleted",
     roomsList: "roomsList",
     raiseEvent: "raiseEvent",
     sceneChanged: "roomSceneChanged",
@@ -16,5 +16,5 @@ export const responseEventsList = {
     connectionMessage: "connected",
     networkVariablesChanged: "netVarsChanged",
     networkVariablesDeleted: "netVarsRemoval",
-    roomObjectActionsBatched: "ovjectActBatched"
+    roomObjectActionsBatched: "objectActBatched"
 }

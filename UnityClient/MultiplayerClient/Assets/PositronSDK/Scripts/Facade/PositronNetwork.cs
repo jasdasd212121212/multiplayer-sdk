@@ -30,18 +30,16 @@ namespace Positron
 
             RoomHostTransferHandler hostTransferHandler = new();
             RoomObjectsTranferHandler objectsTansferHandler = new();
-            RemoveObjectHandler objectRemoveHandler = new();
-            ObjectCreateHandler objectCreateHandler = new();
+            RoomObjectsBatchedModificationHandler modificationHandler = new();
 
-            _roomClient = new(hostTransferHandler, objectsTansferHandler, objectRemoveHandler, objectCreateHandler, _client);
+            _roomClient = new(hostTransferHandler, objectsTansferHandler, modificationHandler, _client);
 
             _client.AddHandler(new GetRoomsHandler());
             _client.AddHandler(new RoomCreationHandler());
             _client.AddHandler(new RoomJoinHandler(_roomClient));
             _client.AddHandler(hostTransferHandler);
             _client.AddHandler(objectsTansferHandler);
-            _client.AddHandler(objectRemoveHandler);
-            _client.AddHandler(objectCreateHandler);
+            _client.AddHandler(modificationHandler);
 
             _initialized = true;
         }
