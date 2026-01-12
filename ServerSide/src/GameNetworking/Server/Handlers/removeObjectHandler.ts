@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
-import { IDeleteObjectPackege } from "./Interfaces/IDeleteObjectPackege.js";
+import { IDeleteObjectPackege } from "./Interfaces/Object/IDeleteObjectPackege.js";
 import { room } from "../../Room/room.js";
 import { gameObject } from "../../Room/gameObject.js";
 import { responseEventsList } from "../responseEventsList.js";

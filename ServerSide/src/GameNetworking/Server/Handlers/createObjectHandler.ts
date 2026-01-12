@@ -6,7 +6,7 @@ import { gameObject } from "../../Room/gameObject.js";
 import { responseEventsList } from "../responseEventsList.js";
 import { client } from "../../ClientConnection/client.js";
 import { syncronizationPackegeGenerationOptions } from "../../Room/Options/syncronizationPackegeGenerationOptions.js";
-import { IObjectCreationPackege } from "./Interfaces/IObjectCreationPackege.js";
+import { IObjectCreationPackege } from "./Interfaces/Object/IObjectCreationPackege.js";
 import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
 
 class createObjectHandler extends serverEventHandlerBase{

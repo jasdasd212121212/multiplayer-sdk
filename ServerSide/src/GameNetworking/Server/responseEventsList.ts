@@ -15,5 +15,6 @@ export const responseEventsList = {
     roomLeaved: "roomLeaved",
     connectionMessage: "connected",
     networkVariablesChanged: "netVarsChanged",
-    networkVariablesDeleted: "netVarsRemoval"
+    networkVariablesDeleted: "netVarsRemoval",
+    roomObjectActionsBatched: "ovjectActBatched"
 }

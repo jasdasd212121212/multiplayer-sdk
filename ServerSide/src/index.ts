@@ -18,6 +18,7 @@ import { UdpServer } from "./UDP/UdpServer.js";
 import { JsonCompressor } from "./Utils/JsonCompressor.js";
 import { socketMiddlewareBase } from "./GameNetworking/Server/Middlewares/Base/socketMiddlewareBase.js";
 import { authKeyMiddleware } from "./GameNetworking/Server/Middlewares/authKeyMiddleware.js";
+import { createOrDeleteObjectsHandler } from "./GameNetworking/Server/Handlers/createOrDeleteObjectsHandler.js";
 
 CfgLoader.init(path.resolve("."));
 JsonCompressor.init();
@@ -39,6 +40,7 @@ handlers.push(new raiseEventHandler(gameServer));
 handlers.push(new changeRoomSceneHandler(gameServer));
 handlers.push(new addOrModifyVariablesHandler(gameServer));
 handlers.push(new removeVariablesFromObjectHandler(gameServer));
+handlers.push(new createOrDeleteObjectsHandler(gameServer));
 
 middlewares.push(new authKeyMiddleware());
 
