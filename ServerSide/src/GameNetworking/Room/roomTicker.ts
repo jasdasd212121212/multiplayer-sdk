@@ -2,6 +2,7 @@ import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
 import { IGameConfig } from "../../CfgSchemas/IGameConfig.js";
 import { udpEventsList } from "../../UDP/udpEventsList.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { ICreatedObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/ICreatedObjectDto.js";
 import { IDeleteObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/IDeleteObjectDto.js";
 import { responseEventsList } from "../Server/responseEventsList.js";
@@ -13,13 +14,15 @@ class roomTicker{
     private attackhedRoom: room;
     private netframeBuffer: netframe;
     private tickrate: number;
+    private raiseEventor: raiseEventor;
 
     private createdBuffer: Array<ICreatedObjectDto> = new Array();
     private deletedBuffer: Array<IDeleteObjectDto> = new Array();
  
-    constructor(room: room){
+    constructor(room: room, eventor: raiseEventor){
         this.attackhedRoom = room;
         this.netframeBuffer = new netframe();
+        this.raiseEventor = eventor;
         this.tickrate = CfgLoader.instance.load<IGameConfig>("game").tickrate;
 
         console.log(`room ticker tickrate: ${this.tickrate}`);
@@ -66,6 +69,10 @@ class roomTicker{
                     deleted: this.deletedBuffer
                 }
             ));
+        }
+
+        if (this.raiseEventor.hasEventsInCurrentActiveBuffer()){
+            await this.raiseEventor.flushEventBuffer();
         }
 
         this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());

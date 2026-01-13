@@ -334,30 +334,38 @@ response: objectActBatched
 request: RaiseEvent
 ```
 {
-    "type": 0,
-    "targets": 3,
-    "sourceObjectId": 0,
-    "additionalIndex": 0,
-    "targetClient": -1,
-    
-    "payload": {
-        "message": "hello"
-    }
+    "events": [
+        {
+            "type": 0,
+            "targets": 3,
+            "sourceObjectId": 0,
+            "additionalIndex": 0,
+            "targetClient": -1,
+            
+            "payload": {
+                "message": "hello"
+            }
+        }
+    ]
 }
 ```
 
 response: raiseEvent
 ```
 {
-    "type": 0,
-    "targets": 3,
-    "sourceObjectId": 0,
-    "additionalIndex": 0,
-    "targetClient": -1,
-    
-    "payload": {
-        "message": "hello"
-    }
+    "events": [
+        {
+            "type": 0,
+            "targets": 3,
+            "sourceObjectId": 0,
+            "additionalIndex": 0,
+            "targetClient": -1,
+            
+            "payload": {
+                "message": "hello"
+            }
+        }
+    ]
 }
 ```
 

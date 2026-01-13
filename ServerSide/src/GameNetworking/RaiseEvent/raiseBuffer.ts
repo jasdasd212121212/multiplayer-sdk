@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js"
+import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/RaiseEvents/IRaiseEventPackege.js"
 import { raiseEventWrapper } from "./raiseEventWrapper.js";
 
 class raiseBuffer{

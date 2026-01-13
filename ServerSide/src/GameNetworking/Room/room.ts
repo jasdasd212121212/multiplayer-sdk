@@ -6,10 +6,11 @@ import { gameObject } from "./gameObject.js"
 import { roomTicker } from "./roomTicker.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
-import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/IRaiseEventPackege.js";
+import { IRaiseEventPackege } from "../Server/Handlers/Interfaces/RaiseEvents/IRaiseEventPackege.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
 import { server } from "../Server/server.js";
 import { netVariablesRepository } from "./Variables/netVariablesRepository.js";
+import { IRaiseEventBatch } from "../Server/Handlers/Interfaces/RaiseEvents/IRaiseEventBatch.js";
 
 class room{
     private name: string;
@@ -45,8 +46,8 @@ class room{
         this.name = roomName;
         this.externalData = additionalData;
 
-        this.ticker = new roomTicker(this);
         this.raiseEventDispatcher = new raiseEventor(this);
+        this.ticker = new roomTicker(this, this.raiseEventDispatcher);
         this.variablesRespository = new netVariablesRepository(this);
 
         this.timeToLive = TTL;
@@ -91,8 +92,8 @@ class room{
         return this.ticker.getTickrate();
     }
 
-    public async sendRaiseEvent(event: IRaiseEventPackege, sourceSocket: Socket): Promise<void>{
-        await this.raiseEventDispatcher.sendEvent(event, sourceSocket);
+    public sendRaiseEvent(eventsBatch: IRaiseEventBatch, sourceSocket: Socket): void{
+        this.raiseEventDispatcher.sendEvent(eventsBatch, sourceSocket);
     }
 
     public async changeScene(newScene: number): Promise<void>{
