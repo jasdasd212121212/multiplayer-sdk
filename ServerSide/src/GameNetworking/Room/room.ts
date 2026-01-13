@@ -100,12 +100,17 @@ class room{
         this.broadcast(responseEventsList.sceneChanged, await JsonCompressor.instance.stringify({newSceneIndexOfRoom: this.scene}));
     }
 
-    public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client): gameObject{
+    public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client, cguid: string): gameObject{
         let created: gameObject = new gameObject(assetPath, creator.getId(), this.nextObjectId, position, rotation);       
         this.objects.set(created.getObjectId(), created);
         this.updateObjectsArray();
 
         this.nextObjectId++;
+
+        this.ticker.addToCreated({
+            cguid: cguid,
+            data: created.getAllData(syncronizationPackegeGenerationOptions.syncAll),
+        });
 
         return created;
     }
@@ -118,6 +123,7 @@ class room{
     }
 
     public findObject(id: number): gameObject{
+        this.ticker.addToDeleted({id: id});
         return this.objects.get(id);
     }
 

@@ -2,6 +2,9 @@ import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
 import { IGameConfig } from "../../CfgSchemas/IGameConfig.js";
 import { udpEventsList } from "../../UDP/udpEventsList.js";
 import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { ICreatedObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/ICreatedObjectDto.js";
+import { IDeleteObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/IDeleteObjectDto.js";
+import { responseEventsList } from "../Server/responseEventsList.js";
 import { netframe } from "./netframe.js";
 import { syncronizationPackegeGenerationOptions } from "./Options/syncronizationPackegeGenerationOptions.js";
 import { room } from "./room.js";
@@ -10,6 +13,9 @@ class roomTicker{
     private attackhedRoom: room;
     private netframeBuffer: netframe;
     private tickrate: number;
+
+    private createdBuffer: Array<ICreatedObjectDto> = new Array();
+    private deletedBuffer: Array<IDeleteObjectDto> = new Array();
  
     constructor(room: room){
         this.attackhedRoom = room;
@@ -30,6 +36,14 @@ class roomTicker{
             }, 1000 / this.tickrate)
     }
 
+    public addToCreated(obj: ICreatedObjectDto): void {
+        this.createdBuffer.push(obj);
+    }
+
+    public addToDeleted(obj: IDeleteObjectDto): void {
+        this.deletedBuffer.push(obj);
+    }
+
     public getTickrate(): number{
         return this.tickrate;
     }
@@ -46,7 +60,18 @@ class roomTicker{
             )
         ));
 
+        if (this.createdBuffer.length != 0 || this.deletedBuffer.length != 0){
+            this.attackhedRoom.broadcast(responseEventsList.roomObjectActionsBatched, await JsonCompressor.instance.stringify({
+                    created: this.createdBuffer,
+                    deleted: this.deletedBuffer
+                }
+            ));
+        }
+
         this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
+
+        this.createdBuffer.length = 0;
+        this.deletedBuffer.length = 0;
     }
 }
 
