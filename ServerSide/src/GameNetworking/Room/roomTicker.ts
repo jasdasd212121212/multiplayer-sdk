@@ -75,6 +75,10 @@ class roomTicker{
             await this.raiseEventor.flushEventBuffer();
         }
 
+        if(this.attackhedRoom.getVariablesRepo().deltaBuffersNotEmpty()){
+            await this.attackhedRoom.getVariablesRepo().flushBufferToNet();
+        }
+
         this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
 
         this.createdBuffer.length = 0;

@@ -12,7 +12,7 @@ export class removeVariablesFromObjectHandler extends serverEventHandlerBase {
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if(currentRoom != null){
-            currentRoom.getVariablesRepo().removeVariablesFromObject(parsed.objectId);
+            await currentRoom.getVariablesRepo().removeVariablesFromObject(parsed.objectId);
         }
     }
 }

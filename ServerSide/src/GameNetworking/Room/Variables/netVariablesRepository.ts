@@ -1,4 +1,3 @@
-import { Socket } from "socket.io";
 import { room } from "../room.js";
 import { INetVariable } from "./Interfaces/INetVariable.js"
 import { INetVariablesArray } from "./Interfaces/INetVariablesArray.js";
@@ -11,6 +10,9 @@ class netVariablesRepository{
 
     private _room: room;
 
+    private _addDeltaBuffer: Array<INetVariable> = new Array();
+    private _modifyDeltaBuffer: Array<INetVariable> = new Array();
+
     constructor(room: room){
         this._room = room;
     }
@@ -19,30 +21,37 @@ class netVariablesRepository{
         return this._variablesArray;
     }
 
-    public async addOrModifyFrom(packege: INetVariablesArray, sourceSources: Socket): Promise<void> {
+    public addOrModifyFrom(packege: INetVariablesArray): void {
         let netVar: INetVariable = null;
-        let addenBuffer: Array<INetVariable> = new Array<INetVariable>();
-        let modifiedBuffer: Array<INetVariable> = new Array<INetVariable>();
 
         for(let i: number = 0; i < packege.variables.length; i++){
             netVar = this.tryFindContainedVariable(packege.variables[i].id);
 
             if(netVar !== null){
                 netVar.data = packege.variables[i].data;
-                modifiedBuffer.push(netVar);
+                this._modifyDeltaBuffer.push(netVar);
             }
             else{
                 this._variablesMap.set(packege.variables[i].id, packege.variables[i]);
-                addenBuffer.push(packege.variables[i]);
+                this._addDeltaBuffer.push(packege.variables[i]);
             }
         }
 
         this.updateVariablesArray();
+    }
 
-        this._room.castOthers(responseEventsList.networkVariablesChanged, await JsonCompressor.instance.stringify({
-            modified: modifiedBuffer,
-            adden: addenBuffer
-        }), sourceSources);
+    public async flushBufferToNet(): Promise<void> {
+        this._room.broadcast(responseEventsList.networkVariablesChanged, await JsonCompressor.instance.stringify({
+            modified: this._modifyDeltaBuffer,
+            adden: this._addDeltaBuffer
+        }));
+
+        this._modifyDeltaBuffer.length = 0;
+        this._addDeltaBuffer.length = 0;
+    }
+
+    public deltaBuffersNotEmpty(): boolean {
+        return this._modifyDeltaBuffer.length != 0 || this._addDeltaBuffer.length != 0
     }
 
     public async removeVariablesFromObject(objectId: number): Promise<void> {

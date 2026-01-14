@@ -12,7 +12,7 @@ export class addOrModifyVariablesHandler extends serverEventHandlerBase{
         let currentRoom: room = this.server.getCachedConnection(sourceSocket);
 
         if (currentRoom != null){
-            currentRoom.getVariablesRepo().addOrModifyFrom(parsed, sourceSocket);
+            currentRoom.getVariablesRepo().addOrModifyFrom(parsed);
         }
     }
 }
