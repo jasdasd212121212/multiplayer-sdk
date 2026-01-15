@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { serverEventHandlerBase } from "./Base/serverEventHandlerBase.js";
 import { IObjectCreateOrDeletePackege } from "./Interfaces/Object/IObjectCreateOrDeletePackege.js";
-import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
+import { ObjectsSerializeUtil } from "../../../Utils/ObjectsSerializeUtil.js";
 import { room } from "../../Room/room.js";
 import { client } from "../../ClientConnection/client.js";
 import { gameObject } from "../../Room/gameObject.js";
@@ -10,7 +10,7 @@ export class createOrDeleteObjectsHandler extends serverEventHandlerBase {
     name: string = "CreateOrDeleteObjects";
 
     async handle(message: string, sourceSocket: Socket): Promise<void> {
-        let parsed: IObjectCreateOrDeletePackege = <IObjectCreateOrDeletePackege> await JsonCompressor.instance.parse(message);
+        let parsed: IObjectCreateOrDeletePackege = <IObjectCreateOrDeletePackege> await ObjectsSerializeUtil.instance.parse(message);
         let room: room = this.server.getCachedConnection(sourceSocket);
 
         if (room !== null) {

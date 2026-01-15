@@ -2,7 +2,7 @@ import { room } from "../room.js";
 import { INetVariable } from "./Interfaces/INetVariable.js"
 import { INetVariablesArray } from "./Interfaces/INetVariablesArray.js";
 import { responseEventsList } from "../../Server/responseEventsList.js";
-import { JsonCompressor } from "../../../Utils/JsonCompressor.js";
+import { ObjectsSerializeUtil } from "../../../Utils/ObjectsSerializeUtil.js";
 
 class netVariablesRepository{
     private _variablesArray: Array<INetVariable> = [];
@@ -41,7 +41,7 @@ class netVariablesRepository{
     }
 
     public async flushBufferToNet(): Promise<void> {
-        this._room.broadcast(responseEventsList.networkVariablesChanged, await JsonCompressor.instance.stringify({
+        this._room.broadcast(responseEventsList.networkVariablesChanged, await ObjectsSerializeUtil.instance.stringify({
             modified: this._modifyDeltaBuffer,
             adden: this._addDeltaBuffer
         }));
@@ -68,7 +68,7 @@ class netVariablesRepository{
 
         this.updateVariablesArray();
 
-        this._room.broadcast(responseEventsList.networkVariablesDeleted, await JsonCompressor.instance.stringify({
+        this._room.broadcast(responseEventsList.networkVariablesDeleted, await ObjectsSerializeUtil.instance.stringify({
             deletedVaraiblesIDs: deletedBuffer
         }));
     }

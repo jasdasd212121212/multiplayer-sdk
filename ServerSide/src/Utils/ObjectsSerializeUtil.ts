@@ -6,8 +6,8 @@ import { CfgLoader } from '../CfgLoader/CfgLoader.js';
 const nonCompressMark = "NCNC";
 const nonCompressMarkSeparator = ";;;";
 
-class JsonCompressor{
-    public static instance: JsonCompressor;
+class ObjectsSerializeUtil{
+    public static instance: ObjectsSerializeUtil;
     private compressPromise: any;
     private decompressPromise: any;
     private compressionThrashold: number = 0;
@@ -21,10 +21,10 @@ class JsonCompressor{
     }
 
     public static init(): void{
-        if(JsonCompressor.instance == null){
+        if(ObjectsSerializeUtil.instance == null){
             let config: ICompressionConfig = CfgLoader.instance.load<ICompressionConfig>("compression");
 
-            JsonCompressor.instance = new JsonCompressor(config.compressionThrashold);
+            ObjectsSerializeUtil.instance = new ObjectsSerializeUtil(config.compressionThrashold);
         }
     }
 
@@ -92,4 +92,4 @@ class JsonCompressor{
     }
 }
 
-export { JsonCompressor }
+export { ObjectsSerializeUtil }

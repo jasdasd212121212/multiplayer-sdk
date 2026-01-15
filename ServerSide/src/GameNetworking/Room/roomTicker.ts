@@ -1,7 +1,7 @@
 import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
 import { IGameConfig } from "../../CfgSchemas/IGameConfig.js";
 import { udpEventsList } from "../../UDP/udpEventsList.js";
-import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { ObjectsSerializeUtil } from "../../Utils/ObjectsSerializeUtil.js";
 import { raiseEventor } from "../RaiseEvent/raiseEventor.js";
 import { ICreatedObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/ICreatedObjectDto.js";
 import { IDeleteObjectDto } from "../Server/Handlers/Interfaces/Object/OutcomingDTO/IDeleteObjectDto.js";
@@ -56,7 +56,7 @@ class roomTicker{
             this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
         }
         
-        this.attackhedRoom.broadcastUdp(udpEventsList.roomTick, await JsonCompressor.instance.stringify(
+        this.attackhedRoom.broadcastUdp(udpEventsList.roomTick, await ObjectsSerializeUtil.instance.stringify(
             this.attackhedRoom.getObjectsPackege(
                 this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()),
                 syncronizationPackegeGenerationOptions.syncOnlyTransfor
@@ -64,7 +64,7 @@ class roomTicker{
         ));
 
         if (this.createdBuffer.length != 0 || this.deletedBuffer.length != 0){
-            this.attackhedRoom.broadcast(responseEventsList.roomObjectActionsBatched, await JsonCompressor.instance.stringify({
+            this.attackhedRoom.broadcast(responseEventsList.roomObjectActionsBatched, await ObjectsSerializeUtil.instance.stringify({
                     created: this.createdBuffer,
                     deleted: this.deletedBuffer
                 }

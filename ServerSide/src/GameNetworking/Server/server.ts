@@ -4,7 +4,7 @@ import { createServer } from "http";
 import { createServer as createSecureServer } from "https";
 import { serverEventHandlerBase } from "./Handlers/Base/serverEventHandlerBase.js";
 import { UdpServer } from "../../UDP/UdpServer.js";
-import { JsonCompressor } from "../../Utils/JsonCompressor.js";
+import { ObjectsSerializeUtil } from "../../Utils/ObjectsSerializeUtil.js";
 import { responseEventsList } from "./responseEventsList.js";
 import { ITransportConfig } from "../../CfgSchemas/ITransportConfig.js";
 import { CfgLoader } from "../../CfgLoader/CfgLoader.js";
@@ -71,7 +71,7 @@ class server{
             let udpUuid: string = this.gameUdpServer.bindIo(user.id);
             
             console.log("new connection. UDP UUID: " + udpUuid);
-            user.emit(responseEventsList.connectionMessage, JsonCompressor.instance.getFullMark() + JSON.stringify({udp: udpUuid}));
+            user.emit(responseEventsList.connectionMessage, ObjectsSerializeUtil.instance.getFullMark() + JSON.stringify({udp: udpUuid}));
 
             for(let i: number = 0; i < this.handlers.length; i++){
                 user.on(this.handlers[i].name, async (data) => {
