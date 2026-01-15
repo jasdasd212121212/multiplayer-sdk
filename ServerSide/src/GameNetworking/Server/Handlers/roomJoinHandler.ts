@@ -26,7 +26,7 @@ class roomJoinHandler extends serverEventHandlerBase{
                 room.addConnection(clientConnection);
                 this.server.addCachedConnection(sourceSocket, room);
 
-                sourceSocket.emit(responseEventsList.clientConnected, await ObjectsSerializeUtil.instance.stringify({ 
+                sourceSocket.emit(responseEventsList.clientConnected, await ObjectsSerializeUtil.instance.serialize({ 
                     clientId: clientId, 
                     hostId: room.getHostClientId(),
                     scene: room.getScene(),

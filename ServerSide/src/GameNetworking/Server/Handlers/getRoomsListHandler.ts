@@ -7,7 +7,7 @@ class getRoomsListHandler extends serverEventHandlerBase{
     name: string = "GetRooms";
 
     async handle(message: string, sourceSocket: Socket): Promise<void> {
-        sourceSocket.emit(responseEventsList.roomsList, await ObjectsSerializeUtil.instance.stringify(this.server.getRoomsList()));
+        sourceSocket.emit(responseEventsList.roomsList, await ObjectsSerializeUtil.instance.serialize(this.server.getRoomsList()));
     }
 }
 

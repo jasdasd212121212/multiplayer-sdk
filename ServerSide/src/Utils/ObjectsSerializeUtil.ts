@@ -2,6 +2,7 @@ import { promisify } from 'util';
 import { brotliCompress, brotliDecompress } from 'zlib';
 import { ICompressionConfig } from '../CfgSchemas/ICompressionConfig.js';
 import { CfgLoader } from '../CfgLoader/CfgLoader.js';
+import { ObjectSerializeStrategy } from './Serializers/Interface/ObjectSerializeStrategy.js';
 
 const nonCompressMark = "NCNC";
 const nonCompressMarkSeparator = ";;;";
@@ -11,20 +12,22 @@ class ObjectsSerializeUtil{
     private compressPromise: any;
     private decompressPromise: any;
     private compressionThrashold: number = 0;
+    private serializer: ObjectSerializeStrategy = null;
 
-    constructor(thrashold: number){
+    constructor(thrashold: number, strategy: ObjectSerializeStrategy){
         this.compressPromise = promisify(brotliCompress);
         this.decompressPromise = promisify(brotliDecompress);
         this.compressionThrashold = thrashold;
+        this.serializer = strategy;
 
         console.log(`JSON compress wrapper thrashold: ${thrashold}`);
     }
 
-    public static init(): void{
+    public static init(strategy: ObjectSerializeStrategy): void{
         if(ObjectsSerializeUtil.instance == null){
             let config: ICompressionConfig = CfgLoader.instance.load<ICompressionConfig>("compression");
 
-            ObjectsSerializeUtil.instance = new ObjectsSerializeUtil(config.compressionThrashold);
+            ObjectsSerializeUtil.instance = new ObjectsSerializeUtil(config.compressionThrashold, strategy);
         }
     }
 
@@ -32,8 +35,8 @@ class ObjectsSerializeUtil{
         return nonCompressMark + nonCompressMarkSeparator;
     }
 
-    public async stringify(input: object): Promise<string>{
-        let jsonString: string = JSON.stringify(input);
+    public async serialize(input: object): Promise<string>{
+        let jsonString: string = this.serializer.serialize(input);
 
         if(jsonString.length > this.compressionThrashold){
             jsonString = await this.compressAsync(jsonString);
@@ -61,7 +64,7 @@ class ObjectsSerializeUtil{
             unpacked = await this.decompressAsync(input);
         }
 
-        return JSON.parse(unpacked);
+        return this.serializer.deserialize(unpacked);
     }
 
     private async compressAsync(str: string): Promise<string>{

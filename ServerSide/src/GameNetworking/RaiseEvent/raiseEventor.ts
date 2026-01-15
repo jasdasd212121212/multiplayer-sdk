@@ -94,7 +94,7 @@ class raiseEventor{
     }
 
     private async sendAll(): Promise<void>{
-        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.stringify(<IRaiseEventBatch> {
+        this.attackhedRoom.broadcast(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.serialize(<IRaiseEventBatch> {
             events: this.sendToAllBuffer
         }));
     }
@@ -103,7 +103,7 @@ class raiseEventor{
         let keys: Array<Socket> = Array.from(this.sendToOthersBuffer.keys());
 
         for(let i: number = 0; i < keys.length; i++){
-            this.attackhedRoom.castOthers(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.stringify(<IRaiseEventBatch> {
+            this.attackhedRoom.castOthers(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.serialize(<IRaiseEventBatch> {
                 events: this.sendToOthersBuffer.get(keys[i])
             }), keys[i]);
         }
@@ -118,7 +118,7 @@ class raiseEventor{
                 let targetClient: number = keys[j];
 
                 if(currentClient.getId() == targetClient){
-                    currentClient.getSocket().emit(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.stringify(<IRaiseEventBatch> {
+                    currentClient.getSocket().emit(responseEventsList.raiseEvent, await ObjectsSerializeUtil.instance.serialize(<IRaiseEventBatch> {
                         events: this.sendToTargetsBuffer.get(targetClient)
                     }));
                 }

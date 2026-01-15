@@ -56,7 +56,7 @@ class roomTicker{
             this.netframeBuffer.write(this.attackhedRoom.getObjectsArray());
         }
         
-        this.attackhedRoom.broadcastUdp(udpEventsList.roomTick, await ObjectsSerializeUtil.instance.stringify(
+        this.attackhedRoom.broadcastUdp(udpEventsList.roomTick, await ObjectsSerializeUtil.instance.serialize(
             this.attackhedRoom.getObjectsPackege(
                 this.netframeBuffer.filterOnlyUpdated(this.attackhedRoom.getObjectsArray()),
                 syncronizationPackegeGenerationOptions.syncOnlyTransfor
@@ -64,7 +64,7 @@ class roomTicker{
         ));
 
         if (this.createdBuffer.length != 0 || this.deletedBuffer.length != 0){
-            this.attackhedRoom.broadcast(responseEventsList.roomObjectActionsBatched, await ObjectsSerializeUtil.instance.stringify({
+            this.attackhedRoom.broadcast(responseEventsList.roomObjectActionsBatched, await ObjectsSerializeUtil.instance.serialize({
                     created: this.createdBuffer,
                     deleted: this.deletedBuffer
                 }

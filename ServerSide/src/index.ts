@@ -17,9 +17,10 @@ import { ObjectsSerializeUtil } from "./Utils/ObjectsSerializeUtil.js";
 import { socketMiddlewareBase } from "./GameNetworking/Server/Middlewares/Base/socketMiddlewareBase.js";
 import { authKeyMiddleware } from "./GameNetworking/Server/Middlewares/authKeyMiddleware.js";
 import { createOrDeleteObjectsHandler } from "./GameNetworking/Server/Handlers/createOrDeleteObjectsHandler.js";
+import { JsonSerializer } from "./Utils/Serializers/JsonSerializer.js";
 
 CfgLoader.init(path.resolve("."));
-ObjectsSerializeUtil.init();
+ObjectsSerializeUtil.init(new JsonSerializer());
 
 let udpServer: UdpServer = new UdpServer();
 let gameServer: server = new server(udpServer);

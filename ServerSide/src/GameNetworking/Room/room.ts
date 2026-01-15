@@ -98,7 +98,7 @@ class room{
 
     public async changeScene(newScene: number): Promise<void>{
         this.scene = newScene;
-        this.broadcast(responseEventsList.sceneChanged, await ObjectsSerializeUtil.instance.stringify({newSceneIndexOfRoom: this.scene}));
+        this.broadcast(responseEventsList.sceneChanged, await ObjectsSerializeUtil.instance.serialize({newSceneIndexOfRoom: this.scene}));
     }
 
     public instatiateObject(assetPath: string, position: vector3, rotation: vector3, creator: client, cguid: string): gameObject{
@@ -200,7 +200,7 @@ class room{
 
             if(this.getHostClientId() == client.getId() && this.getConnectionsCount() > 0){
                 this.transferHost();
-                this.broadcast(responseEventsList.roomHostTransfered, await ObjectsSerializeUtil.instance.stringify({ targetId: this.getHostClientId() }));
+                this.broadcast(responseEventsList.roomHostTransfered, await ObjectsSerializeUtil.instance.serialize({ targetId: this.getHostClientId() }));
             }
 
             if(this.getConnectionsCount() > 0){
@@ -270,7 +270,7 @@ class room{
     private async transferAllObjects(sourceId: number, destinationId: number): Promise<void>{
         let transfered: Array<number> = this.transferObjectNonEmit(sourceId, destinationId);
 
-        this.broadcast(responseEventsList.objectsTransfered, await ObjectsSerializeUtil.instance.stringify({
+        this.broadcast(responseEventsList.objectsTransfered, await ObjectsSerializeUtil.instance.serialize({
             tarnsferedToClient: destinationId, 
             objects: transfered
         }));

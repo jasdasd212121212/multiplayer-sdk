@@ -41,7 +41,7 @@ class netVariablesRepository{
     }
 
     public async flushBufferToNet(): Promise<void> {
-        this._room.broadcast(responseEventsList.networkVariablesChanged, await ObjectsSerializeUtil.instance.stringify({
+        this._room.broadcast(responseEventsList.networkVariablesChanged, await ObjectsSerializeUtil.instance.serialize({
             modified: this._modifyDeltaBuffer,
             adden: this._addDeltaBuffer
         }));
@@ -68,7 +68,7 @@ class netVariablesRepository{
 
         this.updateVariablesArray();
 
-        this._room.broadcast(responseEventsList.networkVariablesDeleted, await ObjectsSerializeUtil.instance.stringify({
+        this._room.broadcast(responseEventsList.networkVariablesDeleted, await ObjectsSerializeUtil.instance.serialize({
             deletedVaraiblesIDs: deletedBuffer
         }));
     }
