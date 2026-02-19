@@ -1,3 +1,25 @@
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root (use sudo)"
+   exit 1
+fi
+
+echo "Enabling TCP BBR..."
+
+cat <<EOF > /etc/sysctl.d/10-bbr.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+EOF
+
+sysctl --system
+
+echo "---------------------------------------"
+if sysctl net.ipv4.tcp_congestion_control | grep -q bbr; then
+    echo "Success! BBR is now enabled."
+    echo "Current TCP Control: $(sysctl net.ipv4.tcp_congestion_control)"
+else
+    echo "Error: BBR could not be enabled."
+fi
+
 cd ~
 cd .. && cd ..
 cd home
